@@ -1,0 +1,86 @@
+# dual-review-loop v0.1 — Acceptance Evidence (2026-09-09)
+
+Environment: codex-cli 0.153.4 (local), Claude Code (local), fixture repo
+`/tmp/arbor-acceptance/fixture*` (base commit 28c4eb4, `store.py` + `test_store.py`
++ `AGENTS.md` declaring `python3 test_store.py` as required validation).
+Loop drivers were fresh-context agents; reviewers were fresh parallel subagents per
+`reviewer-prompt-contract.md`. Plugin skills read from the repo working tree.
+
+## Scenario results
+
+| Scenario | Result | Key evidence |
+|---|---|---|
+| A — clean change | **PASS 1/2** | Both reviewers PASS round 1; validation `python3 test_store.py` exit 0; zero modifications (`git status` identical before/after, diff byte-identical); no commit; structure reviewer withheld a taste item as "Taste only, not a finding". |
+| B — correctness bug | **PASS 2/3** | Round 1: planted partial-application bug flagged P1 blocking (correctness) + path duplication P2 `material improvement` (structure); cross-lens merge F002 (C2+S1). Fix: validate-all-then-apply delegating to `set()`. Validation exit 0. Round 2 NEW reviewers on explicitly FULL scope materialization (full diff quoted in transcript): structure PASS, correctness only residual P2/P3 → gate met. No commits; reviewer writes ruled out via file md5 + `__pycache__` mtime windows. |
+| C — structural regression | **PASS 2/3** | Round 1: correctness P1 (inverted sys: guard, verified empirically) + structure P1 `discipline: blocking regression` (policy smeared across 3 accessors). Dedupe merged cross-lens halves (F001, F002). One batch fix (`SYS_PREFIX` + `_is_sys` predicate, guards made unconditional). Round 2 full scope: structure PASS with taste confined to residual_risks; correctness only new P3 → residual. No commits. |
+| D — duplicate root cause | **PASS 2/3** | 6 raw findings → 5 round-1 F-ids; planted pop-before-validate bug merged into ONE F001 `sources: [correctness, structure]`, fixed ONCE. Explicit no-merge-on-symbol discipline (3 same-symbol findings kept separate by root cause). Round 2: R2-C3 semantically mapped onto existing F003 (no duplicate id). 7 F-ids / 7 root causes total. |
+| E — oscillation guard | **STOP deterministic; contract hardened** | Synthetic 3-round flip-flop (inline→abstract→inline): STOPPED with both trade-offs, no third fix — deterministic. Exposed 2 contract gaps: (1) co-firing guards had no precedence rule for `Reason:`; (2) mislabeled taste-as-`blocking-regression` could not be reclassified (PASS/STOPPED flip risk). FIXED in convergence-contract.md (guard precedence order + label audit with downgrade-only authority). Committed 908f289. |
+| F — project gate | **PASS** (A/C/D runs) | Every run took the validation command verbatim from fixture `AGENTS.md` (`python3 test_store.py`); no plugin-default test command appeared anywhere in any loop transcript. |
+| G — reviewer isolation | **PASS** (A/C/D runs) | Reviewers: no file writes (git status/diff identical across review rounds; D additionally verified via tracked-file mtimes and bytecode timestamps), no nested subagent spawns, no user questions, findings returned to parent only. F1/F2 integrity defenses never triggered. |
+
+## Scenario B run record (final)
+
+- Planted: `batch_set` partial application (raises mid-list after earlier pairs applied)
+  + happy-path-only test.
+- Attempt 1 (structure verdict on record before a 429 rate limit killed the driver):
+  S1 [P2, `discipline: material improvement`] "batch_set reimplements the canonical
+  write path", partial-application defect correctly handed to the correctness lens via
+  residual_risks.
+- Attempt 2 (fresh driver, complete): round-1 correctness C1 [P1, blocking] "applies
+  pairs before validating them → partial writes + phantom audit entries"; dedupe merged
+  C2+S1 into F002 (same root cause: duplicated write path / split None invariant); one
+  batch fix (materialize → validate-all → delegate to `set()`); `python3 test_store.py`
+  exit 0; round 2 with two NEW reviewers on full-scope materialization → structure
+  PASS, correctness residuals only (F004 docstring over-claim P2, F005 dict-as-pairs
+  P3) → PASS 2/3. 5 F-ids / 5 root causes; no commits; no reviewer writes.
+- Bonus defect found by B: `output-format.md` hardcoded "correctness reviewer: PASS" —
+  fixed to allow `FINDINGS (residual only)` when the gate is met by other conditions.
+
+## Verdict against spec §27 acceptance checklist
+
+- Packaging: root portable `plugin.json` (Agent Plugins spec v1.0.0) ✔ · marketplace
+  resolvable ✔ (both formats) · plugin installable ✔ (verified on both CLIs) · 3 skills
+  discoverable ✔ (verified in live sessions on both runtimes) · `agents/openai.yaml`
+  matches skill content ✔ · no unsupported upstream metadata ✔ (`disable-model-invocation`
+  etc. absent).
+- Architecture: reviewers = fresh subagents ✔ · same-round parallel ✔ · read-only ✔
+  (prompt contract verified; Claude runtime additionally enforces via `tools:
+  Read, Grep, Glob` agent defs) · no goal-following ✔ · no nested spawns ✔ · single
+  writer ✔.
+- Scope: baseline frozen at loop start ✔ (28c4eb4 held across rounds in all runs) ·
+  full-scope re-review each round ✔ (C/D drivers explicitly confirmed full-diff
+  materialization, not fix-only) · loop-generated fixes joined next round's scope ✔ ·
+  no fix-diff narrowing ✔.
+- Findings: unified schema ✔ (all envelopes schema-conformant) · orchestrator dedupe ✔
+  · same root cause fixed once ✔ (D) · cross-round semantic mapping ✔ (D: R2-C3→F003) ·
+  no line-number identity ✔.
+- Convergence: P0/P1 = 0 + structural blocking = 0 + validation green + fresh reviewer
+  confirmation → PASS ✔ · max_rounds enforced ✔ · no-progress guard defined and
+  precedence fixed ✔ · oscillation guard verified ✔ (E).
+- Portability: no Iris paths ✔ · no fixed branch names ✔ · no fixed language/test
+  commands ✔ · follows target AGENTS.md ✔ (F) · no default ledger ✔ · no commit/push ✔
+  (git state identical after every run).
+- Legal: upstream licenses re-verified 2026-09-09 (both MIT) ✔ · THIRD_PARTY_NOTICES.md
+  with exact copyright lines (`Copyright (c) 2025 sanyuan0704`,
+  `Copyright (c) 2026 Cursor`) ✔ · adaptation (not verbatim copy) documented ✔ ·
+  no false originality claims ✔.
+
+## Known limitations / residual risks
+
+1. `plugin-eval` (official analyzer) scores 86/100 (B), one static finding:
+   `deferred_cost_tokens` 12,657 above its generic baseline. Deliberate design:
+   self-contained reviewer rubrics + progressive-disclosure references. Revisit with
+   observed usage data in v0.2.
+2. Isolation on Codex is prompt-contract only (agent TOMLs are user config, not
+   installable by plugins); Claude Code runtime-enforces via tool allowlists. Scenario G
+   passed under prompt-contract conditions.
+3. Scenario E shows the oscillation/no-progress detection is judgment-based (semantic
+   comparison); the STOP outcome is deterministic after the precedence fix, but Reason
+   selection depends on the precedence order now encoded in the contract.
+4. Acceptance runs used fresh subagents reading the skills from the repo (prompt-contract
+   isolation), not the installed plugin agent types; the Claude plugin agents
+   (`tools: Read, Grep, Glob`) were separately verified for discovery, and their
+   read-only toolset is runtime-enforced.
+5. One infrastructure event: a 429 rate limit killed the first Scenario B driver
+   mid-round; B was re-run fresh and passed. No results were fabricated from the
+   failed run.

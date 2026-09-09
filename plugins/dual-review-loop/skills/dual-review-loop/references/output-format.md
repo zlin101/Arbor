@@ -27,10 +27,12 @@ Review coverage
 No commit or push was performed.
 ```
 
-Include a `Residual non-blocking` section only when residual findings exist. Validation
-lines list the commands actually run (or `none declared by project` if the project
-defines no validation and none was discoverable). Always end PASS with the line
-`No commit or push was performed.`
+Include a `Residual non-blocking` section only when residual findings exist. In `Review
+coverage`, state each reviewer's actual final verdict: `PASS`, or `FINDINGS (residual
+only)` when its round-final findings are all non-blocking and the gate is met by the
+other conditions. Validation lines list the commands actually run (or `none declared by
+project` if the project defines no validation and none was discoverable). Always end
+PASS with the line `No commit or push was performed.`
 
 ## STOPPED
 
