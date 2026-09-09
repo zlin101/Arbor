@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "arbor",
+  "owner": {
+    "name": "zlin101",
+    "url": "https://github.com/zlin101"
+  },
+  "description": "信息gap (Arbor) — personal agent plugin kit. First plugin: dual-review-loop, a bounded dual-review convergence loop for code changes.",
+  "plugins": [
+    {
+      "name": "dual-review-loop",
+      "displayName": "Dual Review Loop",
+      "description": "Two independent fresh-context read-only reviewers (correctness + structure) review the same frozen change scope in parallel; the main agent fixes actionable blockers, runs project validation, and fresh reviewers re-review the full scope until convergence or a bounded stop.",
+      "source": "./plugins/dual-review-loop",
+      "category": "Developer Tools",
+      "keywords": [
+        "code-review",
+        "convergence-loop",
+        "subagents"
+      ]
+    }
+  ]
+}
