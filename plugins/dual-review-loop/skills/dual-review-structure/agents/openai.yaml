@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dual Review — Structure"
+  short_description: "Read-only maintainability and structural-simplification review with blocking-vs-taste discipline"
+  default_prompt: "Review the current change scope for structural regressions, spaghetti growth, weak abstractions, boundary leaks, and code-judo simplification opportunities. Classify every finding as blocking regression, material improvement, or taste; do not modify anything."
