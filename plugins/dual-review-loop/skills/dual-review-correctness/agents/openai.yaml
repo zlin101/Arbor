@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dual Review — Correctness"
+  short_description: "Read-only correctness, security, and reliability review with P0–P3 severity"
+  default_prompt: "Review the current change scope for correctness bugs, security issues, races, error handling, performance regressions, boundary cases, and missing tests. Report findings in the unified schema; do not modify anything."
