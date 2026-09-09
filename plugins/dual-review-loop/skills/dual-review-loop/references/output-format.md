@@ -39,7 +39,12 @@ PASS with the line `No commit or push was performed.`
 ```text
 Dual Review Loop: STOPPED
 
-Reason: oscillation | max rounds | no progress | permission boundary | unresolved conflict
+Reason: oscillation | max rounds | no progress | permission boundary | blocked | unresolved conflict
+
+`blocked` covers stop conditions outside the named guards: a validation failure that
+blocks confirming correctness (spec: STOP with BLOCKED), a finding needing a product
+decision the repository cannot answer, or any external dependency the loop lacks. For
+`blocked`, `Decision required` states the exact decision or dependency needed.
 
 Rounds: <n>/<max_rounds>
 
