@@ -1,30 +1,27 @@
 # Transcript Index — dual-review-loop v0.1 acceptance runs
 
-Extracted from raw session JSONL (streaming parse). Two file kinds per scenario:
-- `<scenario>.md` — driver identity, evidence class, spawn list, and the driver's
-  FINAL assistant output verbatim (contains the reviewer verdict envelopes, the
-  evidence items a–g, and the final user-facing report).
-- `<scenario>-spawn<N>-full.md` — the COMPLETE, untruncated Agent-tool input for each
-  reviewer spawn: description, subagent_type, and full prompt. These prove per-round
-  dispatch (two spawns per round), what scope materialization round-2 reviewers
-  received (full change vs fix-only diff), and that no prior-round findings were
-  passed to fresh reviewers.
+Extracted from raw session JSONL (streaming parse). Per scenario:
+- `<scenario>.md` — identity, EVIDENCE CLASS, spawn list, final assistant output verbatim
+  (reviewer verdict envelopes + evidence items + final report).
+- `<scenario>-spawn<N>-full.md` — COMPLETE untruncated Agent-tool input per reviewer
+  spawn: proves per-round parallel dispatch, the round-2 scope materialization
+  (full change vs fix-only), and that fresh reviewers received no prior-round findings.
 
-| Scenario | Evidence class | Task | Spawns |
-|---|---|---|---|
-| scenario-H-maxrounds-driver | LIVE-LOOP | `a09a01917592a1acb` | 2 |
-| scenario-I-noprogress-eval | DECISION-PROCEDURE (contract applied to synthetic history) | `a156ef27b60d23496` | 0 |
-| scenario-D-driver | LIVE-LOOP | `a3457f221c22add0a` | 5 |
-| scenario-B-driver-attempt1-429 | LIVE-LOOP (terminated by 429 mid-round-1) | `a5c25448ecdbfb209` | 2 |
-| scenario-A-driver | LIVE-LOOP | `ab1bedc7e5f7fa365` | 2 |
-| scenario-B-driver-retry | LIVE-LOOP | `ac1eebdfd7fcd3f96` | 4 |
-| scenario-C-driver | LIVE-LOOP | `ac4ab3f70c4cf84bc` | 5 |
-| scenario-E-oscillation-eval | DECISION-PROCEDURE (contract applied to synthetic history) | `afc8968426db70db2` | 0 |
+Evidence classes: LIVE-LOOP = fresh driver ran the full loop with real parallel reviewer
+subagents on a fixture repo. DECISION-PROCEDURE = fresh agent applied the contract text
+to a stated synthetic history (no subagents) — verifies the contract's decision
+procedure, not model loop behavior. Classes are labeled and must not be conflated.
 
-8 scenario records, 28 files total (including this index).
-
-Evidence-class legend: LIVE-LOOP = fresh driver executed the full loop with real
-parallel reviewer subagents on a fixture repo. DECISION-PROCEDURE = a fresh agent
-applied the convergence/output contract text to a stated synthetic history without
-subagents — verifies the contract's decision procedure verifiably, not model loop
-behavior. Evidence classes are labeled per scenario and must not be conflated.
+| Scenario | Evidence class |
+|---|---|
+| scenario-A-driver | LIVE-LOOP |
+| scenario-B-driver-attempt1-429 | LIVE-LOOP (terminated by 429 mid-round-1) |
+| scenario-B-driver-retry | LIVE-LOOP |
+| scenario-C-driver | LIVE-LOOP |
+| scenario-D-driver | LIVE-LOOP |
+| scenario-E-oscillation-eval | DECISION-PROCEDURE (contract applied to synthetic history) |
+| scenario-H-maxrounds-driver | LIVE-LOOP |
+| scenario-I-noprogress-eval | DECISION-PROCEDURE (contract applied to synthetic history) |
+| scenario-J-maxrounds-live | LIVE-LOOP (result: PASS 2/2 - converged within budget; max-rounds correctly NOT fired, blockers were zero at exhaustion) |
+| scenario-Jdoubleprime-maxrounds-sole | DECISION-PROCEDURE (result: STOPPED max rounds as SOLE firing guard, deterministic; no-progress mathematically capped at 1 < 2) |
+| scenario-Jprime-maxrounds-precedence | DECISION-PROCEDURE (result: no-progress outranks max-rounds under cardinality progress reading; contract tension documented in convergence-contract.md) |
