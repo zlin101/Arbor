@@ -11,7 +11,7 @@ $ node ~/.codex/.tmp/plugins/plugins/plugin-eval/scripts/plugin-eval.js \
 
 Score: 86/100  Grade: B  Risk: high
 Checks: 1 fail, 0 warn, 4 info
-deferred_cost_tokens: 13078 (excessive)   [re-run after final edits: 13078]
+deferred_cost_tokens: 13203 (excessive)   [final measurement after re-review edits; was 13078 pre-closure, 12971 at first review]
 Fix First: "deferred_cost_tokens is excessive relative to the current Codex baseline.
 Reduce repeated instruction text and move detail into deferred supporting files."
 ```

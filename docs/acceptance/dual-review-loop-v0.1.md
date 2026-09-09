@@ -1,5 +1,10 @@
 # dual-review-loop v0.1 — Acceptance Evidence (2026-09-09)
 
+Raw run records: **`docs/acceptance/transcripts/`** (INDEX.md + per-driver final
+outputs with verbatim reviewer verdict envelopes + per-round spawn dispatch evidence,
+extracted from session JSONL). Summary below; waiver for the plugin-eval budget
+finding: `plugin-eval-budget-waiver.md`.
+
 Environment: codex-cli 0.153.4 (local), Claude Code (local), fixture repo
 `/tmp/arbor-acceptance/fixture*` (base commit 28c4eb4, `store.py` + `test_store.py`
 + `AGENTS.md` declaring `python3 test_store.py` as required validation).
@@ -15,7 +20,9 @@ Loop drivers were fresh-context agents; reviewers were fresh parallel subagents 
 | C — structural regression | **PASS 2/3** | Round 1: correctness P1 (inverted sys: guard, verified empirically) + structure P1 `discipline: blocking regression` (policy smeared across 3 accessors). Dedupe merged cross-lens halves (F001, F002). One batch fix (`SYS_PREFIX` + `_is_sys` predicate, guards made unconditional). Round 2 full scope: structure PASS with taste confined to residual_risks; correctness only new P3 → residual. No commits. |
 | D — duplicate root cause | **PASS 2/3** | 6 raw findings → 5 round-1 F-ids; planted pop-before-validate bug merged into ONE F001 `sources: [correctness, structure]`, fixed ONCE. Explicit no-merge-on-symbol discipline (3 same-symbol findings kept separate by root cause). Round 2: R2-C3 semantically mapped onto existing F003 (no duplicate id). 7 F-ids / 7 root causes total. |
 | E — oscillation guard | **STOP deterministic; contract hardened** | Synthetic 3-round flip-flop (inline→abstract→inline): STOPPED with both trade-offs, no third fix — deterministic. Exposed 2 contract gaps: (1) co-firing guards had no precedence rule for `Reason:`; (2) mislabeled taste-as-`blocking-regression` could not be reclassified (PASS/STOPPED flip risk). FIXED in convergence-contract.md (guard precedence order + label audit with downgrade-only authority). Committed 908f289. |
-| F — project gate | **PASS** (A/C/D runs) | Every run took the validation command verbatim from fixture `AGENTS.md` (`python3 test_store.py`); no plugin-default test command appeared anywhere in any loop transcript. |
+| H — max rounds (live) | **STOPPED 1/1** | Live loop, user override `max_rounds: 1`, planted `ttl` accepted-but-ignored contract bug under AGENTS.md rules forbidding policy invention. Round 1: both reviewers block (correctness P1 + structure `blocking regression`); label audit run and SUPPORTED; fake-convergence "fix" (delete the docstring claim) explicitly rejected as not root-cause; blocker is BLOCKED (needs human decision). Budget exhausted with open blocker → STOPPED. Guard precedence applied live: co-firing `permission boundary` + `max rounds` → Reason = `permission boundary`, max rounds recorded. Baseline frozen, zero writes, validation from AGENTS.md. |
+| I — no-progress (decision procedure) | **STOPPED no progress 3/5** | 4-round synthetic history, same root cause recurring in equivalent form with zero validation improvement: counter arithmetic shown round-by-round (round 1 = baseline, exempt; rounds 2–3 = two consecutive non-shrinking rounds → counter 2 → fire), guards-override-fix-policy honored (no round-3 fix), pre-existing lint failure correctly routed to residual validation risk. Exposed 2 more contract gaps, both FIXED (4c2e2e0): `blocked` was missing from output-format.md's `Reason:` enum; round-1 counter exemption now explicit. |
+| F — project gate | **PASS** (A/B/C/D/H runs) | Every run took the validation command verbatim from fixture `AGENTS.md` (`python3 test_store.py`); no plugin-default test command appeared anywhere in any loop transcript. |
 | G — reviewer isolation | **PASS** (A/C/D runs) | Reviewers: no file writes (git status/diff identical across review rounds; D additionally verified via tracked-file mtimes and bytecode timestamps), no nested subagent spawns, no user questions, findings returned to parent only. F1/F2 integrity defenses never triggered. |
 
 ## Scenario B run record (final)
@@ -53,10 +60,14 @@ Loop drivers were fresh-context agents; reviewers were fresh parallel subagents 
   no fix-diff narrowing ✔.
 - Findings: unified schema ✔ (all envelopes schema-conformant) · orchestrator dedupe ✔
   · same root cause fixed once ✔ (D) · cross-round semantic mapping ✔ (D: R2-C3→F003) ·
-  no line-number identity ✔.
+  no line-number identity ✔ · dedupe contract hardened post-review: shared root cause is
+  the ONLY merge condition; symbol/boundary/risk are supporting indicators, never
+  sufficient alone (9359f7b) ✔.
 - Convergence: P0/P1 = 0 + structural blocking = 0 + validation green + fresh reviewer
-  confirmation → PASS ✔ · max_rounds enforced ✔ · no-progress guard defined and
-  precedence fixed ✔ · oscillation guard verified ✔ (E).
+  confirmation → PASS ✔ · max_rounds enforced ✔ (H: binding 1-round override honored,
+  STOPPED at budget exhaustion with open blocker; reason precedence applied) ·
+  no-progress guard verified ✔ (I: counter arithmetic, fires after 2 consecutive
+  non-shrinking rounds, round-1 exemption explicit) · oscillation guard verified ✔ (E).
 - Portability: no Iris paths ✔ · no fixed branch names ✔ · no fixed language/test
   commands ✔ · follows target AGENTS.md ✔ (F) · no default ledger ✔ · no commit/push ✔
   (git state identical after every run).
@@ -68,15 +79,17 @@ Loop drivers were fresh-context agents; reviewers were fresh parallel subagents 
 ## Known limitations / residual risks
 
 1. `plugin-eval` (official analyzer) scores 86/100 (B), one static finding:
-   `deferred_cost_tokens` 12,657 above its generic baseline. Deliberate design:
-   self-contained reviewer rubrics + progressive-disclosure references. Revisit with
-   observed usage data in v0.2.
+   `deferred_cost_tokens` ~13k vs its population baseline (>1,600 = "excessive").
+   **Formally waived** — `plugin-eval-budget-waiver.md`: trigger/invoke cost = 0
+   (nothing loads until invoked); the deferred bucket IS the contract documentation
+   (spec §8–§21), spread evenly across 12+ components; reaching the band requires
+   deleting ~88% of it. Re-measure with observed usage in v0.2.
 2. Isolation on Codex is prompt-contract only (agent TOMLs are user config, not
    installable by plugins); Claude Code runtime-enforces via tool allowlists. Scenario G
    passed under prompt-contract conditions.
-3. Scenario E shows the oscillation/no-progress detection is judgment-based (semantic
-   comparison); the STOP outcome is deterministic after the precedence fix, but Reason
-   selection depends on the precedence order now encoded in the contract.
+3. Oscillation/no-progress detection is judgment-based (semantic comparison); STOP
+   outcomes are deterministic (E/I), and round-1 counter exemption plus guard
+   precedence are now explicit contract text.
 4. Acceptance runs used fresh subagents reading the skills from the repo (prompt-contract
    isolation), not the installed plugin agent types; the Claude plugin agents
    (`tools: Read, Grep, Glob`) were separately verified for discovery, and their
@@ -84,3 +97,7 @@ Loop drivers were fresh-context agents; reviewers were fresh parallel subagents 
 5. One infrastructure event: a 429 rate limit killed the first Scenario B driver
    mid-round; B was re-run fresh and passed. No results were fabricated from the
    failed run.
+6. Contract defects found BY acceptance (all fixed in-repo): guard precedence +
+   blocking-label audit (908f289), output-format coverage line (f13a468), dedupe
+   root-cause-only merge (9359f7b), `blocked` Reason token + round-1 counter exemption
+   (4c2e2e0). This is the acceptance process working as intended; none remain open.
