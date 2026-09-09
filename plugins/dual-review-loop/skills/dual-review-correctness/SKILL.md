@@ -1,6 +1,6 @@
 ---
 name: dual-review-correctness
-description: Read-only correctness review of a change scope — behavior regressions, security, races/TOCTOU, data integrity, error handling, performance regressions, boundary conditions, and missing tests, with P0–P3 severity. Use as the correctness reviewer inside the dual-review-loop, or standalone when the user asks for a correctness/security-focused review of current changes.
+description: Read-only correctness review — regressions, security, races, error handling, boundaries, missing tests; P0–P3. Use when asked for a correctness or security review of current changes, or as the dual-review-loop correctness reviewer.
 ---
 
 # Dual Review — Correctness

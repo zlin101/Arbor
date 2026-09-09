@@ -1,6 +1,6 @@
 ---
 name: dual-review-structure
-description: Read-only structural review of a change scope — ambitious simplification, code-judo opportunities, abstraction quality, spaghetti/branch growth, canonical layer and type-boundary hygiene, with an explicit blocking-vs-taste discipline. Use as the structure reviewer inside the dual-review-loop, or standalone for a maintainability-focused review of current changes.
+description: Read-only structural review — code-judo, spaghetti growth, abstractions, canonical layers, type boundaries, blocking-vs-taste discipline. Use when asked for a maintainability or structure review of current changes, or as the dual-review-loop structure reviewer.
 ---
 
 # Dual Review — Structure

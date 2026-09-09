@@ -1,6 +1,6 @@
 ---
 name: dual-review-loop
-description: Bounded dual-review convergence loop for a code change — freeze the scope, run two fresh read-only reviewers (correctness + structure) in parallel, dedupe findings, apply single-writer root-cause fixes, run the project's own validation, then re-review the full scope with two NEW reviewers until PASS or a bounded STOP. Use when the user asks to run the dual review loop, converge a change with dual reviewers, or review-and-fix until clean.
+description: Bounded dual-review convergence loop — two fresh read-only reviewers in parallel, dedupe, fix, validate, full-scope re-review until PASS or bounded STOP. Use when asked to run the dual review loop or review-and-fix a change until clean.
 ---
 
 # Dual Review Loop

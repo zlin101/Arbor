@@ -30,3 +30,19 @@ claude plugin install dual-review-loop@arbor
 
 Reviewer rubrics are attributed adaptations of MIT-licensed upstream skills —
 see `plugins/dual-review-loop/THIRD_PARTY_NOTICES.md`.
+
+## Publishing（Owner 操作，未自动执行）
+
+```bash
+# 首次发布：推送到 GitHub（需要 Owner 权限）
+git remote add origin git@github.com:zlin101/Arbor.git
+git push -u origin main
+
+# 之后任意机器安装（Codex）
+codex plugin marketplace add zlin101/Arbor
+codex plugin add dual-review-loop@arbor
+
+# 之后任意机器安装（Claude Code）
+claude plugin marketplace add zlin101/Arbor
+claude plugin install dual-review-loop@arbor
+```

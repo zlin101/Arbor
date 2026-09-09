@@ -1,58 +1,70 @@
 # Waiver — plugin-eval `deferred_cost_tokens` (dual-review-loop v0.1)
 
-Status: **WAIVED (formal)** · Date: 2026-09-09 · Waiver owner: zlin101
+Status: **WAIVED (formal, narrowed)** · Date: 2026-09-10 · Waiver owner: zlin101
 Re-evaluate: v0.2, with observed-usage data attached (`plugin-eval benchmark`).
 
-## Finding
+## Scope of this waiver
+
+Covers exactly one remaining check: the **plugin-level** `deferred_cost_tokens`
+budget band. Everything else is green — after the 2026-09-10 fixes, all three skills
+analyze clean individually:
+
+```
+$ node ~/.codex/.tmp/plugins/plugins/plugin-eval/scripts/plugin-eval.js \
+    analyze plugins/dual-review-loop/skills/<skill> --format markdown
+
+dual-review-loop          Score: 100/100  Checks: 0 fail, 0 warn  (trigger 63 moderate, invoke 1239 good, deferred 4892 moderate)
+dual-review-correctness   Score: 100/100  Checks: 0 fail, 0 warn  (trigger 64 moderate, invoke 1186 good, deferred 1594 good)
+dual-review-structure     Score: 100/100  Checks: 0 fail, 0 warn  (trigger 72 moderate, invoke 1313 good, deferred  992 good)
+```
+
+(History: the 2026-09-09 review correctly flagged that a plugin-level run alone is a
+generic analysis and understates skill-level costs — per-skill runs showed
+`trigger_cost_tokens` fails and `trigger-description` warnings. The warnings were fixed
+by rewriting all three descriptions with explicit "Use when …" trigger sentences
+tightened to 63–72 tokens, inside the empirical moderate band (≤73); the trigger fails
+cleared as a result. Only the plugin-level deferred finding remains, and only that is
+waived.)
+
+## The remaining finding
 
 ```
 $ node ~/.codex/.tmp/plugins/plugins/plugin-eval/scripts/plugin-eval.js \
     analyze plugins/dual-review-loop --format markdown
 
-Score: 86/100  Grade: B  Risk: high
+Score: 86/100  Grade: B
 Checks: 1 fail, 0 warn, 4 info
-deferred_cost_tokens: 13203 (excessive)   [final measurement after re-review edits; was 13078 pre-closure, 12971 at first review]
-Fix First: "deferred_cost_tokens is excessive relative to the current Codex baseline.
-Reduce repeated instruction text and move detail into deferred supporting files."
+deferred_cost_tokens: 13091 (excessive)
 ```
 
-Analyzer band thresholds (from its own `src/core/baseline.js`): deferred bands are
-good ≤320 / moderate ≤900 / heavy ≤1600 (directory profile) / excessive >1600.
+(13,091 after the description tightening; 13,203 before; band source: population
+baseline, excessive > ~2,200.)
 
 ## Why waived, not fixed
 
-1. **The fail bucket is the product.** The 13,078 deferred tokens are the loop's
-   contract documents: 5 convergence-loop references (scope freeze, reviewer isolation,
-   finding schema, convergence gate, output format), 3 reviewer checklists, 3 SKILL.md
-   bodies, and 2 reviewer agent definitions — 12+ components of 500–1,400 tokens each,
-   with no dominant bloated file. Reaching ≤1,600 would require deleting ~88% of the
-   contracts that implement spec §8–§21.
+1. **The failing bucket is the product.** The deferred bucket is the loop's contract
+   documentation — the 5 convergence-loop references (scope freeze, reviewer isolation,
+   finding schema, convergence gate, output format; spec §8–§21), 3 reviewer checklists,
+   and per-skill reference files, spread evenly across 12+ components of 500–1,400
+   tokens with no dominant bloated file. Reaching the band would require deleting
+   roughly 85% of the contracts that implement the spec.
 
-2. **The always-loaded cost — what the budget exists to protect — is zero.**
-   `trigger_cost_tokens = 0`, `invoke_cost_tokens = 0` (both "good"). Nothing enters
-   context until a skill is invoked, and the heavy references load only on demand
-   (progressive disclosure, per spec §26 Phase 3). The analyzer's own recommended fix —
-   "move detail into deferred supporting files" — is already fully applied; the residual
-   complaint is that the SUM of on-demand files exceeds a population baseline calibrated
-   for typical single-purpose skills (median 240).
+2. **Nothing loads until it is needed.** Per-skill numbers show the always/often-loaded
+   surfaces (trigger + invoke) are all "good" bands; the loop skill's own references
+   are "moderate". The heavy content is deferred by design — progressive disclosure per
+   spec §26 Phase 3 — and a single round loads only the contracts that round needs, not
+   the 13k total. The analyzer's own caveat applies to this check: "No observed usage
+   is attached yet, so budget conclusions are still based on static estimates."
 
-3. **Per-invocation cost is bounded by design.** A single loop round loads the
-   orchestrator SKILL.md plus at most the references it needs (scope + isolation +
-   schema + convergence ≈ 2.5k tokens) and each reviewer loads only its own skill —
-   not the full 13k. The budget tool measures static totals; it cannot express
-   per-round load profiles (its own `Fix First` text concedes conclusions are static:
-   "No observed usage supplied yet, so budget conclusions are still based on static
-   estimates").
-
-4. **Acceptance behavior does not degrade with size.** Scenarios A–I (see
-   `dual-review-loop-v0.1.md`) passed with these contracts as-is, including the
-   fresh-context, isolation, and full-scope re-review properties the contracts define.
+3. **Acceptance behavior is unaffected by the size.** Scenarios A–I (see
+   `dual-review-loop-v0.1.md`) passed with these contracts, including fresh-context,
+   isolation, full-scope re-review, and all stop guards.
 
 ## Conditions of this waiver
 
-- Re-measure in v0.2 with observed usage (`plugin-eval benchmark`); if real rounds show
-  reference files loading that rounds do not need, split or trim then, guided by data.
-- Any future content ADDED to references must justify its tokens against a scenario;
-  do not grow deferred content speculatively.
-- This waiver covers only the `deferred_cost_tokens` static finding. Any future
-  fail/error check of a different kind requires its own disposition.
+- Re-measure in v0.2 with observed usage (`plugin-eval benchmark`); if real rounds load
+  references a round does not need, split or trim then, guided by data.
+- Any content ADDED to reference files must justify its tokens against a scenario; do
+  not grow deferred content speculatively.
+- This waiver covers only the plugin-level `deferred_cost_tokens` band. Any new or
+  different fail/error requires its own disposition.
