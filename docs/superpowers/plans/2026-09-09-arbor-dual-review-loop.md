@@ -83,14 +83,14 @@ Not created (spec §5, §30.2): `scripts/`, `hooks/`, `mcp.json`, `assets/`, `.c
 **Interfaces:**
 - Produces: marketplace id `arbor` resolvable by BOTH `codex plugin marketplace add <repo>` and `claude plugin marketplace add <repo>`; plugin entry pointing at `./plugins/dual-review-loop` (Task 2 fills the plugin dir).
 
-- [ ] **Step 1: Rename unborn branch to main**
+- [x] **Step 1: Rename unborn branch to main**
 
 ```bash
 cd /home/liam/git/Arbor && git symbolic-ref HEAD refs/heads/main
 git branch --show-current   # expect: main (unborn, no commits yet is fine)
 ```
 
-- [ ] **Step 2: Root LICENSE (MIT, exact text)**
+- [x] **Step 2: Root LICENSE (MIT, exact text)**
 
 Create `LICENSE`:
 
@@ -118,7 +118,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-- [ ] **Step 3: `.gitignore`**
+- [x] **Step 3: `.gitignore`**
 
 ```text
 .DS_Store
@@ -127,7 +127,7 @@ node_modules/
 __pycache__/
 ```
 
-- [ ] **Step 4: Codex marketplace manifest `.agents/plugins/marketplace.json`**
+- [x] **Step 4: Codex marketplace manifest `.agents/plugins/marketplace.json`**
 
 Shape verified against the official `openai-curated` marketplace on codex 0.153.4:
 
@@ -154,7 +154,7 @@ Shape verified against the official `openai-curated` marketplace on codex 0.153.
 }
 ```
 
-- [ ] **Step 5: Claude marketplace manifest `.claude-plugin/marketplace.json`**
+- [x] **Step 5: Claude marketplace manifest `.claude-plugin/marketplace.json`**
 
 ```json
 {
@@ -182,7 +182,7 @@ Shape verified against the official `openai-curated` marketplace on codex 0.153.
 }
 ```
 
-- [ ] **Step 6: Root `README.md`**
+- [x] **Step 6: Root `README.md`**
 
 Content (write verbatim, expand each bullet to 1–2 sentences):
 
@@ -217,7 +217,7 @@ Reviewer rubrics are attributed adaptations of MIT-licensed upstream skills —
 see `plugins/dual-review-loop/THIRD_PARTY_NOTICES.md`.
 ```
 
-- [ ] **Step 7: Validate both JSON files**
+- [x] **Step 7: Validate both JSON files**
 
 ```bash
 python3 - <<'EOF'
@@ -228,7 +228,7 @@ EOF
 ```
 Expected: `OK` ×2.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add README.md LICENSE .gitignore .agents .claude-plugin docs
@@ -248,7 +248,7 @@ Co-Authored-By: Claude Code <noreply@anthropic.com>"
 **Interfaces:**
 - Produces: plugin id `dual-review-loop` installable from marketplace `arbor` on both runtimes; `skills/` and `agents/` dirs declared; THIRD_PARTY_NOTICES with exact upstream copyright lines.
 
-- [ ] **Step 1: Codex portable manifest `plugins/dual-review-loop/plugin.json`**
+- [x] **Step 1: Codex portable manifest `plugins/dual-review-loop/plugin.json`**
 
 Per the Agent Plugins spec (v1.0.0, official schema URL below): `$schema` + `name` required; `version`/`description`/`author` required for submission-grade packages; `skills/` is AUTO-DISCOVERED in portable packages (the `skills` field is legacy — omit it; verified empirically: codex 0.153.4 cached and discovered skills with no such field). All field values are spec-legal (`author` limited to name/email/url):
 
@@ -272,7 +272,7 @@ Per the Agent Plugins spec (v1.0.0, official schema URL below): `$schema` + `nam
 }
 ```
 
-- [ ] **Step 2: Claude manifest `plugins/dual-review-loop/.claude-plugin/plugin.json`**
+- [x] **Step 2: Claude manifest `plugins/dual-review-loop/.claude-plugin/plugin.json`**
 
 ```json
 {
@@ -294,9 +294,9 @@ Per the Agent Plugins spec (v1.0.0, official schema URL below): `$schema` + `nam
 }
 ```
 
-- [ ] **Step 3: Plugin LICENSE** — same MIT text as root LICENSE (Task 1 Step 2).
+- [x] **Step 3: Plugin LICENSE** — same MIT text as root LICENSE (Task 1 Step 2).
 
-- [ ] **Step 4: `CHANGELOG.md`**
+- [x] **Step 4: `CHANGELOG.md`**
 
 ```markdown
 # Changelog
@@ -309,7 +309,7 @@ Per the Agent Plugins spec (v1.0.0, official schema URL below): `$schema` + `nam
 - Works on Codex (portable root plugin.json + repo marketplace) and Claude Code (.claude-plugin manifests + read-only reviewer agents).
 ```
 
-- [ ] **Step 5: `THIRD_PARTY_NOTICES.md`** — write verbatim:
+- [x] **Step 5: `THIRD_PARTY_NOTICES.md`** — write verbatim:
 
 ```markdown
 # Third-Party Notices
@@ -353,9 +353,9 @@ for this plugin's automated convergence loop.
   bounded stop guards.
 ```
 
-- [ ] **Step 6: Plugin `README.md`** — user-facing doc covering: what the loop does (flow diagram from spec §0); the three skills; invocation examples for both runtimes (`/dual-review-loop` in Claude, skill trigger in Codex); inputs (scope source, optional `strict`, optional `max_rounds`); what it will never do (no commit/push, no default ledger); runtime notes (Codex: reviewers are prompt-isolated subagents; Claude: reviewers run on read-only-tool agent definitions); link to THIRD_PARTY_NOTICES.
+- [x] **Step 6: Plugin `README.md`** — user-facing doc covering: what the loop does (flow diagram from spec §0); the three skills; invocation examples for both runtimes (`/dual-review-loop` in Claude, skill trigger in Codex); inputs (scope source, optional `strict`, optional `max_rounds`); what it will never do (no commit/push, no default ledger); runtime notes (Codex: reviewers are prompt-isolated subagents; Claude: reviewers run on read-only-tool agent definitions); link to THIRD_PARTY_NOTICES.
 
-- [ ] **Step 7: Validate**
+- [x] **Step 7: Validate**
 
 ```bash
 python3 - <<'EOF'
@@ -368,7 +368,7 @@ grep -c "Copyright (c) 2025 sanyuan0704" plugins/dual-review-loop/THIRD_PARTY_NO
 grep -c "Copyright (c) 2026 Cursor" plugins/dual-review-loop/THIRD_PARTY_NOTICES.md        # expect 1
 ```
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add plugins/dual-review-loop
@@ -393,9 +393,9 @@ These are the loop's real product asset (spec §0). Written BEFORE the skills so
 **Interfaces:**
 - Produces: the exact contract text later tasks reference. Reviewer skills (Tasks 4–5) inline the finding schema fields listed below; the orchestrator (Task 7) links these docs.
 
-- [ ] **Step 1: `review-scope.md`** — implement spec §10 verbatim in contract form. Must contain: the scope model YAML block (`scope_type: branch | working-tree | commit-range | files`, `base_ref`, `baseline_commit`, `paths`, `include_staged`, `include_unstaged`, `include_untracked`); freeze-baseline-not-snapshot rule; merge-base rule for branch review; working-tree rule (staged + unstaged + relevant untracked); the "scope must stay semantically stable across rounds" rule with the forbidden "only the previous fix diff" anti-pattern; changed scope vs context scope distinction; loop-generated files join next round's scope (spec §10.4).
+- [x] **Step 1: `review-scope.md`** — implement spec §10 verbatim in contract form. Must contain: the scope model YAML block (`scope_type: branch | working-tree | commit-range | files`, `base_ref`, `baseline_commit`, `paths`, `include_staged`, `include_unstaged`, `include_untracked`); freeze-baseline-not-snapshot rule; merge-base rule for branch review; working-tree rule (staged + unstaged + relevant untracked); the "scope must stay semantically stable across rounds" rule with the forbidden "only the previous fix diff" anti-pattern; changed scope vs context scope distinction; loop-generated files join next round's scope (spec §10.4).
 
-- [ ] **Step 2: `reviewer-prompt-contract.md`** — contains, verbatim, the isolation template from spec §8 ("You are a review subagent, not the primary implementation agent. … Hard boundaries: … Fresh-review rule: …"); the fresh-context rule from spec §9 (never resume a reviewer; each round spawns NEW threads; never narrate prior-round findings to a reviewer); a spawn checklist (what the parent must pass: frozen scope materialization, applicable project instructions, rubric = the reviewer skill, output contract); the dual-runtime table:
+- [x] **Step 2: `reviewer-prompt-contract.md`** — contains, verbatim, the isolation template from spec §8 ("You are a review subagent, not the primary implementation agent. … Hard boundaries: … Fresh-review rule: …"); the fresh-context rule from spec §9 (never resume a reviewer; each round spawns NEW threads; never narrate prior-round findings to a reviewer); a spawn checklist (what the parent must pass: frozen scope materialization, applicable project instructions, rubric = the reviewer skill, output contract); the dual-runtime table:
 
 | Runtime | Parallel spawn | Read-only enforcement | Reviewer identity |
 |---|---|---|---|
@@ -404,7 +404,7 @@ These are the loop's real product asset (spec §0). Written BEFORE the skills so
 
 Plus spec §28 F1/F2 defenses: if a reviewer produced write operations, that round's result is invalid — discard and re-spawn fresh. Plus an OPTIONAL Codex hardening note: Codex per-agent `sandbox_mode = "read-only"` lives in user/project `.codex/agents/*.toml` (agent TOMLs are user/project config — a plugin cannot install them), so the orchestrator may SUGGEST the user add read-only reviewer TOMLs, but must work without them.
 
-- [ ] **Step 3: `finding-schema.md`** — the unified schema (spec §12) as a fenced yaml block:
+- [x] **Step 3: `finding-schema.md`** — the unified schema (spec §12) as a fenced yaml block:
 
 ```yaml
 local_id: R1
@@ -424,11 +424,11 @@ recommended_direction: smallest useful direction, not a full implementation plan
 
 Plus reviewer verdict envelope (`reviewer: correctness | structure`, `verdict: PASS | FINDINGS`, `findings: [...]`, `coverage: ...`, `residual_risks: [...]`); dedupe semantics from spec §13 (merge on same root cause / same symbol or ownership boundary / same behavior risk / one fix eliminates both — NEVER merge on title wording, exact line, or category string); global ID assignment `F001…` by the orchestrator with cross-round semantic mapping (never identity-by-line-number); merged-finding shape with `sources:` list; lifecycle `OPEN | RESOLVED | BLOCKED | WAIVED` per spec §14 (WAIVED only by user or project rule; the agent may never self-waive a blocker).
 
-- [ ] **Step 4: `convergence-contract.md`** — spec §17 + §18 + §15 as the machine-checkable contract: the five PASS conditions; P2 policy (fix when direct + low-risk + in-scope, else residual, never blocks PASS by default; user-invoked strict/zero-findings/fix-everything-reasonable promotes P2 to gate); P3 never blocks; structural-reviewer discipline (must label each finding `blocking regression | material actionable improvement | optional taste`; taste cannot block); fix policy (single writer; fix order P0 → P1 → structural blocker → in-scope low-risk P2 → P3 not auto-fixed; one coherent root-cause batch per round — never fix-review-fix-review ping-pong); forbidden automatic actions (commit/amend/push/merge/PR/branch-delete/destructive reset/revert/touching unrelated user work — unless the user explicitly asked); validation priority order (project AGENTS.md → project scripts/Makefile/package manifests → targeted tests on touched scope → final full validation) and the pre-existing-failure rule (spec §16.3); guards table `max_rounds: 3`, `no_progress_rounds: 2`, oscillation, permission boundary, reviewer conflict (evidence resolution first, then BLOCKED — never majority vote); user may override guard numbers explicitly.
+- [x] **Step 4: `convergence-contract.md`** — spec §17 + §18 + §15 as the machine-checkable contract: the five PASS conditions; P2 policy (fix when direct + low-risk + in-scope, else residual, never blocks PASS by default; user-invoked strict/zero-findings/fix-everything-reasonable promotes P2 to gate); P3 never blocks; structural-reviewer discipline (must label each finding `blocking regression | material actionable improvement | optional taste`; taste cannot block); fix policy (single writer; fix order P0 → P1 → structural blocker → in-scope low-risk P2 → P3 not auto-fixed; one coherent root-cause batch per round — never fix-review-fix-review ping-pong); forbidden automatic actions (commit/amend/push/merge/PR/branch-delete/destructive reset/revert/touching unrelated user work — unless the user explicitly asked); validation priority order (project AGENTS.md → project scripts/Makefile/package manifests → targeted tests on touched scope → final full validation) and the pre-existing-failure rule (spec §16.3); guards table `max_rounds: 3`, `no_progress_rounds: 2`, oscillation, permission boundary, reviewer conflict (evidence resolution first, then BLOCKED — never majority vote); user may override guard numbers explicitly.
 
-- [ ] **Step 5: `output-format.md`** — the two report templates from spec §21 (PASS and STOPPED), verbatim skeleton, plus the brevity rule (no ten-page process log; user gets final state, high-value findings, changes, validation, residual risk, stop reason) and the fixed closing line `No commit or push was performed.` on PASS.
+- [x] **Step 5: `output-format.md`** — the two report templates from spec §21 (PASS and STOPPED), verbatim skeleton, plus the brevity rule (no ten-page process log; user gets final state, high-value findings, changes, validation, residual risk, stop reason) and the fixed closing line `No commit or push was performed.` on PASS.
 
-- [ ] **Step 6: Verify no drift from spec**
+- [x] **Step 6: Verify no drift from spec**
 
 ```bash
 grep -L "max_rounds" plugins/dual-review-loop/skills/dual-review-loop/references/*.md | grep convergence-contract && echo "MISSING" || echo "OK"
@@ -439,7 +439,7 @@ grep -q "No commit or push" plugins/dual-review-loop/skills/dual-review-loop/ref
 ```
 Expected: four/five `OK` lines, no `MISSING`.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add plugins/dual-review-loop/skills/dual-review-loop/references
@@ -462,7 +462,7 @@ Co-Authored-By: Claude Code <noreply@anthropic.com>"
 - Consumes: schema from Task 3 Step 3 (inline copy, self-contained).
 - Produces: reviewer verdict YAML envelope (`reviewer: correctness`, `verdict: PASS|FINDINGS`, findings array, `coverage`, `residual_risks`) that Task 7's orchestrator parses; skill is independently invocable.
 
-- [ ] **Step 1: `SKILL.md`** — frontmatter exactly:
+- [x] **Step 1: `SKILL.md`** — frontmatter exactly:
 
 ```markdown
 ---
@@ -483,7 +483,7 @@ Body sections, in order:
 9. **Output contract** — the YAML envelope, inline (self-contained, ~25 lines): `reviewer: correctness`, `verdict: PASS | FINDINGS`, `findings:` list of the unified schema (local_id C1, C2, …; category values from the unified enum), `coverage:` one line on what was actually reviewed, `residual_risks:` list (empty allowed). No prose review document, no next-steps menu, no questions to the user.
 10. **Explicitly out of role** — bullet list: maintainability/style/taste findings belong to the structural reviewer; do not emit them.
 
-- [ ] **Step 2: `agents/openai.yaml`** (UI metadata only — not a permission boundary):
+- [x] **Step 2: `agents/openai.yaml`** (UI metadata only — not a permission boundary):
 
 ```yaml
 interface:
@@ -492,11 +492,11 @@ interface:
   default_prompt: "Review the current change scope for correctness bugs, security issues, races, error handling, performance regressions, boundary cases, and missing tests. Report findings in the unified schema; do not modify anything."
 ```
 
-- [ ] **Step 3: `references/correctness-checklist.md`** — adapted (condensed, de-interactivized) from upstream `solid-checklist.md` + `code-quality-checklist.md`: behavior regression & side-effect tracing section; error handling anti-patterns (swallowed exceptions, over-broad catch, async errors, error info leakage); boundary conditions (null/empty/numeric off-by-one/string edges); performance (N+1, hot-path costs, unbounded memory, missing timeouts); SOLID/architecture **only when it endangers correctness of the change** (SRP/DIP violations that cause the bug risk), one short section ending "structural taste belongs to the structural reviewer"; each item as a terse `- **name**: sign` bullet; no "Ask the user" anywhere.
+- [x] **Step 3: `references/correctness-checklist.md`** — adapted (condensed, de-interactivized) from upstream `solid-checklist.md` + `code-quality-checklist.md`: behavior regression & side-effect tracing section; error handling anti-patterns (swallowed exceptions, over-broad catch, async errors, error info leakage); boundary conditions (null/empty/numeric off-by-one/string edges); performance (N+1, hot-path costs, unbounded memory, missing timeouts); SOLID/architecture **only when it endangers correctness of the change** (SRP/DIP violations that cause the bug risk), one short section ending "structural taste belongs to the structural reviewer"; each item as a terse `- **name**: sign` bullet; no "Ask the user" anywhere.
 
-- [ ] **Step 4: `references/security-reliability-checklist.md`** — adapted from upstream `security-checklist.md`, KEEPING the strong race/TOCTOU/data-integrity material: input/output safety (injection, XSS, SSRF, path traversal); authn/authz (missing tenancy/ownership checks, IDOR, trusting client ids); secrets & PII leakage; race conditions (shared state, check-then-act with the `if not exists: create` / read-modify-write / check-then-deduct pattern examples, DB concurrency: optimistic/pessimistic locking, non-atomic counters; distributed: missing locks, cache invalidation races); data integrity (partial writes, missing transactions/idempotency, lost updates); supply-chain only when the change touches dependencies.
+- [x] **Step 4: `references/security-reliability-checklist.md`** — adapted from upstream `security-checklist.md`, KEEPING the strong race/TOCTOU/data-integrity material: input/output safety (injection, XSS, SSRF, path traversal); authn/authz (missing tenancy/ownership checks, IDOR, trusting client ids); secrets & PII leakage; race conditions (shared state, check-then-act with the `if not exists: create` / read-modify-write / check-then-deduct pattern examples, DB concurrency: optimistic/pessimistic locking, non-atomic counters; distributed: missing locks, cache invalidation races); data integrity (partial writes, missing transactions/idempotency, lost updates); supply-chain only when the change touches dependencies.
 
-- [ ] **Step 5: Portable-frontmatter + behavior guard checks**
+- [x] **Step 5: Portable-frontmatter + behavior guard checks**
 
 ```bash
 head -4 plugins/dual-review-loop/skills/dual-review-correctness/SKILL.md | grep -E '^(name|description):'   # exactly these two keys
@@ -506,7 +506,7 @@ grep -q "verdict: PASS | FINDINGS" plugins/dual-review-loop/skills/dual-review-c
 ```
 Expected: `OK non-interactive`, `OK no-markup`, `OK verdict`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add plugins/dual-review-loop/skills/dual-review-correctness
@@ -531,7 +531,7 @@ Co-Authored-By: Claude Code <noreply@anthropic.com>"
 - Consumes: unified finding schema (inline copy).
 - Produces: verdict envelope with `reviewer: structure`; every finding MUST also carry a `discipline:` line (`blocking regression | material improvement | taste`) consumed by the orchestrator's convergence gate and oscillation guard.
 
-- [ ] **Step 1: `SKILL.md`** — frontmatter exactly:
+- [x] **Step 1: `SKILL.md`** — frontmatter exactly:
 
 ```markdown
 ---
@@ -554,7 +554,7 @@ Body sections, in order:
 7. **Output contract** — same inline YAML envelope (`reviewer: structure`, `verdict: PASS | FINDINGS`, findings with local_id S1, S2, …, `coverage:`, `residual_risks:`), plus the `discipline:` field on each finding. Categories from the unified enum (`architecture | maintainability | abstraction | complexity | types`).
 8. **Out of role** — correctness/security/performance findings belong to the correctness reviewer; do not duplicate them.
 
-- [ ] **Step 2: `agents/openai.yaml`**
+- [x] **Step 2: `agents/openai.yaml`**
 
 ```yaml
 interface:
@@ -563,9 +563,9 @@ interface:
   default_prompt: "Review the current change scope for structural regressions, spaghetti growth, weak abstractions, boundary leaks, and code-judo simplification opportunities. Classify every finding as blocking regression, material improvement, or taste; do not modify anything."
 ```
 
-- [ ] **Step 3: `references/structural-quality-checklist.md`** — adapted from upstream thermo SKILL.md (single file upstream → our condensed checklist): sections for Ambition & code-judo; Spaghetti & branching growth; Abstraction quality (thin wrappers, speculative generality, magic indirection); Canonical layer & reuse (feature logic in shared paths, bespoke duplicates); Type & boundary clarity; File/component sprawl (size as evidence only); Orchestration & atomicity (needless sequencing, half-applied state); Preferred remedies list (delete indirection, reframe state model, move ownership, collapse branches, reuse canonical helper — kept from upstream, trimmed); Review tone (direct, serious, never soften real regressions; never present taste as blocker). Include the upstream "Primary Review Questions" condensed to the 8 highest-signal ones.
+- [x] **Step 3: `references/structural-quality-checklist.md`** — adapted from upstream thermo SKILL.md (single file upstream → our condensed checklist): sections for Ambition & code-judo; Spaghetti & branching growth; Abstraction quality (thin wrappers, speculative generality, magic indirection); Canonical layer & reuse (feature logic in shared paths, bespoke duplicates); Type & boundary clarity; File/component sprawl (size as evidence only); Orchestration & atomicity (needless sequencing, half-applied state); Preferred remedies list (delete indirection, reframe state model, move ownership, collapse branches, reuse canonical helper — kept from upstream, trimmed); Review tone (direct, serious, never soften real regressions; never present taste as blocker). Include the upstream "Primary Review Questions" condensed to the 8 highest-signal ones.
 
-- [ ] **Step 4: Guard checks**
+- [x] **Step 4: Guard checks**
 
 ```bash
 grep -q "disable-model-invocation" plugins/dual-review-loop/skills/dual-review-structure/SKILL.md && echo "FAIL frontmatter" || echo "OK portable"
@@ -574,7 +574,7 @@ grep -qi "1000" plugins/dual-review-loop/skills/dual-review-structure/SKILL.md &
 grep -q "verdict: PASS | FINDINGS" plugins/dual-review-loop/skills/dual-review-structure/SKILL.md && echo "OK verdict"
 ```
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add plugins/dual-review-loop/skills/dual-review-structure
@@ -598,7 +598,7 @@ Co-Authored-By: Claude Code <noreply@anthropic.com>"
 - Consumes: reviewer skills from Tasks 4–5 (loaded via Claude `skills:` preload).
 - Produces: agent types the orchestrator dispatches by name on Claude Code; hard read-only via tool allowlist (stronger than prompt-only).
 
-- [ ] **Step 1: `agents/dual-review-correctness-reviewer.md`**
+- [x] **Step 1: `agents/dual-review-correctness-reviewer.md`**
 
 ```markdown
 ---
@@ -624,9 +624,9 @@ Judge the current code on its own evidence. Do not assume earlier reviewer
 conclusions were correct.
 ```
 
-- [ ] **Step 2: `agents/dual-review-structure-reviewer.md`** — same shape; `skills: dual-review-structure`; description covers structural review + blocking-vs-taste discipline; final line of body: same Hard boundaries block.
+- [x] **Step 2: `agents/dual-review-structure-reviewer.md`** — same shape; `skills: dual-review-structure`; description covers structural review + blocking-vs-taste discipline; final line of body: same Hard boundaries block.
 
-- [ ] **Step 3: Validate agent files**
+- [x] **Step 3: Validate agent files**
 
 ```bash
 grep -q "^tools: Read, Grep, Glob" plugins/dual-review-loop/agents/dual-review-correctness-reviewer.md && \
@@ -634,7 +634,7 @@ grep -q "^tools: Read, Grep, Glob" plugins/dual-review-loop/agents/dual-review-s
 grep -cE "^name: [a-z-]+$" plugins/dual-review-loop/agents/*.md   # expect 2 (lowercase-hyphen, no colon in name)
 ```
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add plugins/dual-review-loop/agents
@@ -655,7 +655,7 @@ Co-Authored-By: Claude Code <noreply@anthropic.com>"
 - Consumes: reviewer skills (Tasks 4–5), Claude reviewer agents (Task 6), all five reference contracts (Task 3).
 - Produces: the user-facing loop; final PASS/STOPPED report per `output-format.md`.
 
-- [ ] **Step 1: `SKILL.md`** — frontmatter exactly:
+- [x] **Step 1: `SKILL.md`** — frontmatter exactly:
 
 ```markdown
 ---
@@ -673,7 +673,7 @@ Body must stay core-flow-only (progressive disclosure, spec §26 Phase 3) with s
 6. **Final report** — render per `references/output-format.md` (PASS / STOPPED templates; brevity rule; always end PASS with `No commit or push was performed.`).
 7. **Links** — the five reference files with one-line purposes.
 
-- [ ] **Step 2: `agents/openai.yaml`**
+- [x] **Step 2: `agents/openai.yaml`**
 
 ```yaml
 interface:
@@ -682,7 +682,7 @@ interface:
   default_prompt: "Run the dual review loop on the current change: freeze the scope, review with two fresh read-only reviewers, fix actionable blockers, validate, and re-review until PASS or a bounded stop."
 ```
 
-- [ ] **Step 3: Portability + spec-fidelity checks**
+- [x] **Step 3: Portability + spec-fidelity checks**
 
 ```bash
 grep -qiE "go test|pytest|npm test|cargo test" plugins/dual-review-loop/skills/dual-review-loop/SKILL.md && echo "FAIL hardcoded-test-cmd" || echo "OK no-hardcoded-commands"
@@ -692,7 +692,7 @@ grep -q "references/" plugins/dual-review-loop/skills/dual-review-loop/SKILL.md 
 head -4 plugins/dual-review-loop/skills/dual-review-loop/SKILL.md | grep -E '^(name|description):'
 ```
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add plugins/dual-review-loop/skills/dual-review-loop
@@ -707,21 +707,21 @@ Co-Authored-By: Claude Code <noreply@anthropic.com>"
 
 **Files:** none created (checks only).
 
-- [ ] **Step 1: Official validator (Codex)** — run from repo root:
+- [x] **Step 1: Official validator (Codex)** — run from repo root:
 
 ```bash
 node /home/liam/.codex/.tmp/plugins/plugins/plugin-eval/scripts/plugin-eval.js analyze plugins/dual-review-loop --format markdown
 ```
 Expected: report with no manifest errors. Fix any findings it raises (it is authoritative for Codex skill/plugin quality), re-run until clean or only advisory notes remain; record the output in the session log.
 
-- [ ] **Step 2: Claude validator**
+- [x] **Step 2: Claude validator**
 
 ```bash
 claude plugin validate plugins/dual-review-loop
 ```
 Expected: no errors. (If the `.claude-plugin` schema flags the sibling Codex files, record and resolve — the known-good fallback is moving nothing; unknown fields are warnings, not failures.)
 
-- [ ] **Step 3: Global hygiene sweep**
+- [x] **Step 3: Global hygiene sweep**
 
 ```bash
 grep -rn "TODO\|TBD\|FIXME\|placeholder" plugins/ README.md --include="*.md" --include="*.json" --include="*.yaml" | grep -v THIRD_PARTY || echo "OK no-placeholders"
@@ -730,17 +730,17 @@ import json,yaml,sys
 for p in ['plugins/dual-review-loop/skills/dual-review-loop/agents/openai.yaml','plugins/dual-review-loop/skills/dual-review-correctness/agents/openai.yaml','plugins/dual-review-loop/skills/dual-review-structure/agents/openai.yaml']:
     yaml.safe_load(open(p)); print('OK',p)" 2>/dev/null || python3 -c "print('yaml module unavailable — spot-check manually')"
 for f in plugins/dual-review-loop/skills/*/SKILL.md; do head -4 "$f" | grep -q "^name:" && head -4 "$f" | grep -q "^description:" && echo "OK frontmatter $f"; done
-grep -rn "disable-model-invocation\|allowed-tools:" plugins/ && echo "FAIL nonportable" || echo "OK portable-frontmatter-only"
+grep -rn "disable-model-invocation\|allowed-tools:" plugins/dual-review-loop/skills plugins/dual-review-loop/agents && echo "FAIL nonportable" || echo "OK portable-frontmatter-only"
 ```
 Expected: all `OK`.
 
-- [ ] **Step 4: Cross-reference integrity** — every `references/*.md` linked from a SKILL.md exists; every `skills:` preload name in `agents/*.md` matches a skill directory name; every agent name in the orchestrator's runtime-adaptation section matches Task 6 filenames:
+- [x] **Step 4: Cross-reference integrity** — every `references/*.md` linked from a SKILL.md exists; every `skills:` preload name in `agents/*.md` matches a skill directory name; every agent name in the orchestrator's runtime-adaptation section matches Task 6 filenames:
 
 ```bash
 for f in plugins/dual-review-loop/skills/*/SKILL.md; do grep -o "references/[a-z-]*\.md" "$f" | while read r; do d=$(dirname "$f"); test -f "$d/$r" && echo "OK $r" || echo "MISSING $r in $f"; done; done
 ```
 
-- [ ] **Step 5: Commit any fixes**
+- [x] **Step 5: Commit any fixes**
 
 ```bash
 git add -A && git commit -m "fix: address static validation findings
@@ -754,7 +754,7 @@ Co-Authored-By: Claude Code <noreply@anthropic.com>" || echo "nothing to commit"
 
 **Files:** none created. Uses the verified local CLI; NO push, NO GitHub (spec §31).
 
-- [ ] **Step 1: Add local marketplace**
+- [x] **Step 1: Add local marketplace**
 
 ```bash
 codex plugin marketplace add /home/liam/git/Arbor
@@ -762,7 +762,7 @@ codex plugin marketplace list | grep arbor
 ```
 Expected: `arbor  /home/liam/git/Arbor`.
 
-- [ ] **Step 2: Install plugin + verify discovery**
+- [x] **Step 2: Install plugin + verify discovery**
 
 ```bash
 codex plugin list | grep dual-review-loop
@@ -771,16 +771,16 @@ codex plugin list | grep dual-review-loop   # expect: installed, enabled
 find ~/.codex/plugins/cache/arbor -name SKILL.md | sort   # expect all three skills
 ```
 
-- [ ] **Step 3: Fallback gate** — if Step 1/2 had failed on the root manifest (they did not in the probe, but re-verify), add `.codex-plugin/plugin.json` as compat fallback per spec §4.1 and record the deviation in plugin README. Only do this if actually required.
+- [x] **Step 3: Fallback gate** — if Step 1/2 had failed on the root manifest (they did not in the probe, but re-verify), add `.codex-plugin/plugin.json` as compat fallback per spec §4.1 and record the deviation in plugin README. Only do this if actually required.
 
-- [ ] **Step 4: Skill-level visibility** — start a throwaway codex exec in a scratch dir:
+- [x] **Step 4: Skill-level visibility** — start a throwaway codex exec in a scratch dir:
 
 ```bash
 cd /tmp && codex exec "List the dual-review-loop plugin skills you can see, by name only." 2>&1 | tail -5
 ```
 Expected: the three skill names appear. (If non-interactive exec cannot see plugin skills, run `codex` interactively via the user — record either way.)
 
-- [ ] **Step 5: Clean up (leave user env untouched)**
+- [x] **Step 5: Clean up (leave user env untouched)**
 
 ```bash
 codex plugin remove dual-review-loop@arbor && codex plugin marketplace remove arbor
@@ -791,7 +791,7 @@ codex plugin marketplace list | grep arbor || echo "OK cleaned"
 
 ### Task 10: Claude Code local validation + smoke test
 
-- [ ] **Step 1: Validate**
+- [x] **Step 1: Validate**
 
 ```bash
 claude plugin marketplace add /home/liam/git/Arbor
@@ -800,20 +800,20 @@ claude plugin list 2>/dev/null | grep -i dual-review || claude -p "List installe
 ```
 Expected: plugin installed; three skills namespaced (`dual-review-loop:dual-review-loop` etc.); two agents present (`dual-review-loop:dual-review-correctness-reviewer`, `…-structure-reviewer`).
 
-- [ ] **Step 2: Skill discovery spot check**
+- [x] **Step 2: Skill discovery spot check**
 
 ```bash
 claude -p "Do you have access to a skill named dual-review-loop? Answer yes/no and list its sibling skills from the same plugin." 2>&1 | tail -5
 ```
 Expected: yes + the two reviewer skills.
 
-- [ ] **Step 3: Clean up**
+- [x] **Step 3: Clean up**
 
 ```bash
 claude plugin uninstall dual-review-loop@arbor 2>/dev/null || claude plugin remove dual-review-loop@arbor 2>/dev/null; claude plugin marketplace remove arbor
 ```
 
-- [ ] **Step 4: Commit any fixes the smoke tests forced, else skip**
+- [x] **Step 4: Commit any fixes the smoke tests forced, else skip**
 
 ---
 
@@ -832,11 +832,11 @@ Build the fixture: a tiny git repo (3 files: `store.py`, `test_store.py`, `AGENT
 - **F — Project gate:** `AGENTS.md` validation command is used verbatim; no plugin-default test command appears anywhere in the transcript.
 - **G — Reviewer isolation:** transcript shows reviewers performed zero writes (on Claude: by tool allowlist; verify no Edit/Write tool calls), no nested spawns, no user questions.
 
-- [ ] **Step 1:** Build fixture + run A/B/C — record transcripts under `/tmp/arbor-acceptance/evidence/`.
-- [ ] **Step 2:** Run D/E/F/G — same.
-- [ ] **Step 3:** Tally against spec §27 acceptance checklist (Packaging/Architecture/Scope/Findings/Convergence/Portability/Legal) and write the verdict summary into the final response (file tree, design summary, validation evidence, remaining risks, release commands NOT executed, readiness verdict).
+- [x] **Step 1:** Build fixture + run A/B/C — record transcripts under `/tmp/arbor-acceptance/evidence/`.
+- [x] **Step 2:** Run D/E/F/G — same.
+- [x] **Step 3:** Tally against spec §27 acceptance checklist (Packaging/Architecture/Scope/Findings/Convergence/Portability/Legal) and write the verdict summary into the final response (file tree, design summary, validation evidence, remaining risks, release commands NOT executed, readiness verdict).
 
-- [ ] **Step 4: Commit any repo-side fixes discovered during acceptance**
+- [x] **Step 4: Commit any repo-side fixes discovered during acceptance**
 
 ```bash
 git add -A && git commit -m "fix: acceptance-driven corrections
@@ -851,3 +851,31 @@ Co-Authored-By: Claude Code <noreply@anthropic.com>" || echo "nothing to commit"
 - **Spec coverage:** §5 layout → Tasks 1–7; §6 manifests → Task 2; §7–9 roles/isolation/fresh-context → Tasks 3 (Step 2), 4, 5, 6, 7; §10 scope → Task 3 Step 1; §11 rubrics → Tasks 4–5 (+ references); §12–14 findings/dedupe/lifecycle → Task 3 Step 3; §15–18 fix/validation/convergence/guards → Task 3 Step 4 + Task 7; §19 algorithm → Task 7 Step 1 §3; §20 envelopes → Tasks 4–5; §21 report → Task 3 Step 5; §22 AGENTS.md boundary → Task 7 + Task 11-F; §23 no-ledger → convergence contract + orchestrator; §24 attribution → Task 2 (exact copyright lines verified); §25 thermos precedent → Task 3 Step 2 + Task 7 runtime adaptation; §26 phases 1–8 → Tasks 1–11; §27 acceptance → Task 11 Step 3; §28 failure modes → spread across contracts + Task 11; §30 ablations respected (no scripts/, no ledger, no third reviewer, no config files, no .codex-plugin default). Gaps deliberately deferred to v0.2+ per spec §29.
 - **Placeholder scan:** rubric/checklist prose (Tasks 3–5 bodies) is specified prescriptively (exact sections, exact retained/removed items, exact verbatim anchors) rather than pasted in full — the authoritative source text is in-repo (`docs/…spec.md` §8/§10/§12/§15–21) plus the two upstream rubrics captured verbatim in this session's research; Task 3 Step 3 and Task 4/5 SKILL.md frontmatter + schema blocks are given verbatim where drift would break integration. No "TBD/TODO" items.
 - **Type consistency:** skill names (`dual-review-loop`, `dual-review-correctness`, `dual-review-structure`), agent names (`dual-review-correctness-reviewer`, `dual-review-structure-reviewer`), F-id scheme, `discipline:` field, `verdict: PASS | FINDINGS` envelope, and marketplace id `arbor` are used identically across Tasks 2–11.
+
+---
+
+## Execution Addendum — re-review closure round (2026-09-09, post first acceptance review)
+
+First acceptance review returned 暂不通过 with five blockers. Dispositions:
+
+1. **Raw transcripts missing** → extracted from session JSONL to
+   `/tmp/arbor-acceptance/evidence/transcripts/` (INDEX.md + per-driver final outputs
+   with verbatim reviewer envelopes + per-spawn dispatch evidence) and persisted
+   in-repo at `docs/acceptance/transcripts/`.
+2. **Dedupe contract allowed merge on symbol alone** → `finding-schema.md` §3
+   rewritten: shared root cause is the ONLY merge condition; symbol/boundary/risk are
+   supporting indicators, never sufficient. Matches scenario D's audited behavior.
+3. **plugin-eval 1 fail (deferred_cost_tokens)** → formal waiver
+   `docs/acceptance/plugin-eval-budget-waiver.md`: trigger/invoke = 0 (good);
+   13,078 deferred tokens are the contract docs themselves (12+ even components);
+   reaching the ≤1,600 band means deleting ~88% of spec §8–§21 implementation.
+   Re-measure with observed usage in v0.2.
+4. **max_rounds / no-progress lacked run evidence** → added scenario H (live loop,
+   `max_rounds: 1`, unresolvable-in-loop contract bug under AGENTS.md policy rules →
+   expected STOPPED with open blocker) and scenario I (no-progress counter arithmetic
+   applied to a 4-round synthetic history → STOPPED no progress), transcripts in the
+   same directory. Scenario E already provided live oscillation + max-rounds co-fire.
+5. **Task 8 metadata grep false-positive** → check now scopes `skills/` + `agents/`
+   only (THIRD_PARTY_NOTICES.md attribution prose is legitimately out of scope).
+
+New commits after this addendum close items 1–5; acceptance doc updated accordingly.

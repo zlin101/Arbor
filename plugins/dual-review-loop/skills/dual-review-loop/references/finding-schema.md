@@ -54,14 +54,21 @@ same root cause, same symbol / ownership boundary, same behavior risk.
 
 ## 3. Dedupe semantics
 
-Merge two findings into one when any of these holds:
+**Merge two findings into one ONLY when they share a root cause** — i.e. one underlying
+defect or design decision produces both, and fixing one naturally eliminates the other.
 
-- same root cause;
+Supporting indicators (evidence FOR a shared root cause, never sufficient alone):
+
 - same or adjacent symbol, or same ownership boundary;
 - same behavioral risk;
-- fixing one would naturally eliminate the other.
+- one fix would naturally eliminate both.
 
-Do NOT merge on: similar titles, identical line numbers, or matching category strings.
+A shared symbol or boundary WITHOUT a shared root cause is the classic over-merge trap:
+several distinct defects routinely live in one function. Same symbol + different root
+cause → separate F-ids.
+
+Do NOT merge on: similar titles, identical line numbers, matching category strings,
+symbol adjacency alone, or "the same area of code".
 
 Merged finding shape:
 
