@@ -22,6 +22,9 @@ Loop drivers were fresh-context agents; reviewers were fresh parallel subagents 
 | E — oscillation guard | **STOP deterministic; contract hardened** | Synthetic 3-round flip-flop (inline→abstract→inline): STOPPED with both trade-offs, no third fix — deterministic. Exposed 2 contract gaps: (1) co-firing guards had no precedence rule for `Reason:`; (2) mislabeled taste-as-`blocking-regression` could not be reclassified (PASS/STOPPED flip risk). FIXED in convergence-contract.md (guard precedence order + label audit with downgrade-only authority). Committed 908f289. |
 | H — max rounds (live) | **STOPPED 1/1** | Live loop, user override `max_rounds: 1`, planted `ttl` accepted-but-ignored contract bug under AGENTS.md rules forbidding policy invention. Round 1: both reviewers block (correctness P1 + structure `blocking regression`); label audit run and SUPPORTED; fake-convergence "fix" (delete the docstring claim) explicitly rejected as not root-cause; blocker is BLOCKED (needs human decision). Budget exhausted with open blocker → STOPPED. Guard precedence applied live: co-firing `permission boundary` + `max rounds` → Reason = `permission boundary`, max rounds recorded. Baseline frozen, zero writes, validation from AGENTS.md. |
 | I — no-progress (decision procedure) | **STOPPED no progress 3/5** | 4-round synthetic history, same root cause recurring in equivalent form with zero validation improvement: counter arithmetic shown round-by-round (round 1 = baseline, exempt; rounds 2–3 = two consecutive non-shrinking rounds → counter 2 → fire), guards-override-fix-policy honored (no round-3 fix), pre-existing lint failure correctly routed to residual validation risk. Exposed 2 more contract gaps, both FIXED (4c2e2e0): `blocked` was missing from output-format.md's `Reason:` enum; round-1 counter exemption now explicit. |
+| J — max-rounds, live | **PASS 2/2** (honest outcome) | Live loop, binding `max_rounds: 2`, three planted independent P1s. Round-1 reviewers empirically reproduced and reported ALL three; one batch fixed all; round 2 confirmed with only new non-blocking residuals → gate met. Equally important negative evidence: at budget exhaustion with ZERO blockers open, the max-rounds row correctly did NOT fire ("blockers open" predicate enforced) — no false stop. Demonstrates the guard's predicate precision live. |
+| J′ — max-rounds precedence (decision procedure) | **STOPPED no progress 3/3** (by precedence) | Blocker-rotation history {A}→{B}→{C}: under the contract's cardinality progress definition, replaced-by-new-blockers rounds count as non-shrinking → no-progress fires at round 3 and OUTRANKS max rounds (precedence row "no progress → max rounds" exercised). Exposed the cardinality-definition tension (discovery of new independent defects reads as no-progress); now documented as deliberate in convergence-contract.md (stop signal for non-converging changes). |
+| J″ — max-rounds sole cause (decision procedure) | **STOPPED max rounds 3/3** | Shrinking-then-stuck history {A,B,C} → {C} → {C}: counter capped at 1 < 2 (round-1 exemption + round-2 progress), so no-progress mathematically cannot fire; oscillation/permission/conflict all negative; **max rounds is the SOLE satisfied guard** and determines the terminal state. Deterministic; a deviant per-finding counter reading changes only the Reason label, never the outcome. |
 | F — project gate | **PASS** (A/B/C/D/H runs) | Every run took the validation command verbatim from fixture `AGENTS.md` (`python3 test_store.py`); no plugin-default test command appeared anywhere in any loop transcript. |
 | G — reviewer isolation | **PASS** (A/C/D runs) | Reviewers: no file writes (git status/diff identical across review rounds; D additionally verified via tracked-file mtimes and bytecode timestamps), no nested subagent spawns, no user questions, findings returned to parent only. F1/F2 integrity defenses never triggered. |
 
@@ -65,9 +68,14 @@ Loop drivers were fresh-context agents; reviewers were fresh parallel subagents 
   sufficient alone (9359f7b) ✔.
 - Convergence: P0/P1 = 0 + structural blocking = 0 + validation green + fresh reviewer
   confirmation → PASS ✔ · max_rounds enforced ✔ (H: binding 1-round override honored,
-  STOPPED at budget exhaustion with open blocker; reason precedence applied) ·
-  no-progress guard verified ✔ (I: counter arithmetic, fires after 2 consecutive
-  non-shrinking rounds, round-1 exemption explicit) · oscillation guard verified ✔ (E).
+  precedence applied; J″: max-rounds proven as SOLE firing guard with deterministic
+  terminal state; J: predicate precision live — budget exhaustion with zero blockers
+  does NOT fire the row; J′: precedence "no progress → max rounds" exercised) ·
+  no-progress guard verified ✔ (I live-arithmetic: fires after 2 consecutive
+  non-shrinking rounds, round-1 exemption explicit; J′/J″ counter walks) ·
+  oscillation guard verified ✔ (E). Evidence classes (LIVE-LOOP vs DECISION-PROCEDURE)
+  are labeled per scenario in the table above and in `transcripts/INDEX.md`; live and
+  decision-procedure evidence are not conflated.
 - Portability: no Iris paths ✔ · no fixed branch names ✔ · no fixed language/test
   commands ✔ · follows target AGENTS.md ✔ (F) · no default ledger ✔ · no commit/push ✔
   (git state identical after every run).
@@ -78,12 +86,14 @@ Loop drivers were fresh-context agents; reviewers were fresh parallel subagents 
 
 ## Known limitations / residual risks
 
-1. `plugin-eval` (official analyzer) scores 86/100 (B), one static finding:
-   `deferred_cost_tokens` ~13k vs its population baseline (>1,600 = "excessive").
-   **Formally waived** — `plugin-eval-budget-waiver.md`: trigger/invoke cost = 0
-   (nothing loads until invoked); the deferred bucket IS the contract documentation
-   (spec §8–§21), spread evenly across 12+ components; reaching the band requires
-   deleting ~88% of it. Re-measure with observed usage in v0.2.
+1. `plugin-eval` findings, final state: **all three skills analyze 100/100 (0 fail,
+   0 warn)** after the 2026-09-10 description fixes (explicit "Use when …" triggers,
+   63–72 tokens, inside the moderate band); the ONLY remaining finding is the
+   plugin-level `deferred_cost_tokens` band (~13k vs population baseline) —
+   **formally waived** — `plugin-eval-budget-waiver.md` (the deferred bucket IS the
+   spec §8–§21 contract documentation, 12+ even components; per-round load is bounded
+   by progressive disclosure; all trigger/invoke surfaces are in "good" bands).
+   Re-measure with observed usage in v0.2.
 2. Isolation on Codex is prompt-contract only (agent TOMLs are user config, not
    installable by plugins); Claude Code runtime-enforces via tool allowlists. Scenario G
    passed under prompt-contract conditions.

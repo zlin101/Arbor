@@ -99,7 +99,9 @@ Progress = the set of open blockers shrank, or validation moved from failing to
 passing. Compare against the previous round's blocking set semantically (root cause,
 not line numbers). Round 1 establishes the baseline and NEVER counts as a no-progress
 round — counting starts from the first round that can be compared against a previous
-one.
+one. A blocking set REPLACED by new independent blockers (same size, different root
+causes) counts as NOT shrinking — deliberate: each round surfacing fresh P1s means the
+change is not converging under review, which is itself a stop signal.
 
 **Guard precedence**: when several stop conditions fire in the same round, evaluate in
 this order and use the first match as the report's `Reason:` (listing any others in
