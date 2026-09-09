@@ -26,6 +26,15 @@ as a finding; at most one aggregate `residual_risks` line). If the change introd
 structural regression, PASS is the correct verdict even when further polish is
 imaginable.
 
+**Label audit (main agent, before treating structure findings as blockers).** A finding
+labeled `blocking regression` counts as a blocker only if its evidence names concrete
+material worsening introduced by THIS change (new spaghetti, boundary leak, duplicated
+canonical logic) relative to the baseline. If the label is unsupported — the cited
+"regression" contradicts a previous round's demand, describes a pre-existing condition,
+or is preference phrased as regression — the main agent reclassifies it to
+`material improvement` or `taste` and says so in the final report. The main agent may
+downgrade labels, never upgrade them.
+
 ## 2. Fix policy
 
 - **Single writer**: reviewers never write; the main agent is the only writer.
@@ -89,3 +98,9 @@ no_progress_rounds: 2
 Progress = the set of open blockers shrank, or validation moved from failing to
 passing. Compare against the previous round's blocking set semantically (root cause,
 not line numbers).
+
+**Guard precedence**: when several stop conditions fire in the same round, evaluate in
+this order and use the first match as the report's `Reason:` (listing any others in
+`What was tried` if material): oscillation → permission boundary → reviewer conflict →
+no progress → max rounds. Guards override the fix policy: once a stop condition fires,
+no further fixes are applied, even ones the fix order would rank as actionable.
