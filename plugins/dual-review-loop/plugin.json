@@ -1,0 +1,17 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "dual-review-loop",
+  "version": "0.1.0",
+  "description": "Run two independent code reviewers, fix actionable findings, validate, and repeat until the change converges or a bounded stop condition is reached.",
+  "author": {
+    "name": "zlin101"
+  },
+  "homepage": "https://github.com/zlin101/Arbor",
+  "repository": "https://github.com/zlin101/Arbor",
+  "license": "MIT",
+  "keywords": [
+    "code-review",
+    "dual-review",
+    "convergence-loop"
+  ]
+}

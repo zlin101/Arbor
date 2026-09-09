@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "dual-review-loop",
+  "version": "0.1.0",
+  "description": "Dual-review convergence loop: two fresh read-only reviewers in parallel, single-writer fixes, project validation, full-scope re-review until PASS or bounded STOP.",
+  "author": {
+    "name": "zlin101",
+    "url": "https://github.com/zlin101"
+  },
+  "homepage": "https://github.com/zlin101/Arbor",
+  "license": "MIT",
+  "keywords": [
+    "code-review",
+    "convergence-loop",
+    "subagents"
+  ]
+}
