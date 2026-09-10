@@ -7,6 +7,10 @@ category with failures; prints every failure it finds.
 
 This checker understands structured facts only (paths, JSON/YAML keys, presence
 of required clauses). It does not parse policy semantics and never edits files.
+
+NOTE: PyYAML is REQUIRED for reliable frontmatter/YAML validation. Without it,
+checks degrade to string-pattern matching, which may produce false passes.
+Install with: pip install pyyaml
 """
 from __future__ import annotations
 
@@ -16,8 +20,9 @@ import re
 import sys
 
 try:
-    import yaml  # optional; frontmatter checks degrade gracefully without it
-except ImportError:  # pragma: no cover
+    import yaml
+except ImportError:
+    print("WARNING: PyYAML not installed; YAML checks degrade to pattern matching", file=sys.stderr)
     yaml = None
 
 REPO = pathlib.Path(__file__).resolve().parent.parent

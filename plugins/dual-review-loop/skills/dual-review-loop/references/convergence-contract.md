@@ -164,12 +164,14 @@ even if a guard's pattern is also detectable.
 ### Progress semantics
 
 Classify the previous round's open gate blockers against the current round
-semantically (root cause, not line numbers):
+semantically (root cause, not line numbers). "New" means a root cause that has
+NEVER appeared in this session — a re-surfacing root cause is always persistent
+(reopened), never new churn (see finding-schema.md §2 for identity rules):
 
 ```text
-persistent = previous ∩ current    # same root cause still open
+persistent = previous ∩ current    # same root cause still open (or reopened)
 resolved   = previous − current    # fixed and confirmed by fresh review
-new        = current − previous    # first surfacing this round (churn)
+new        = current − previous    # root cause NEVER seen before in this session (churn)
 ```
 
 - **Stagnation** (the ONLY thing the no-progress guard measures): every persistent

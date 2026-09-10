@@ -67,11 +67,13 @@ same root cause, same symbol / ownership boundary, same behavior risk.
 Identity rules:
 
 - An F-id is minted at the root cause's FIRST appearance and is never renumbered or
-  reused — not across rounds, and not after a discarded round (discarded ids are
-  reclaimed and skipped).
+  reused for a different root cause — not across rounds, and not after a discarded
+  round.
 - Identity is per ROOT CAUSE for the whole session: if a resolved root cause
-  re-surfaces in a later round, it REUSES its original F-id and returns to OPEN
-  (it is then `persistent` for progress purposes, not `new` churn).
+  re-surfaces in a later round, it REUSES its original F-id and returns to OPEN.
+- For progress semantics: "new" means a root cause that has NEVER appeared in this
+  session before. A re-surfacing root cause is always `persistent` (reopened), never
+  `new` churn — even if it was absent for one or more intermediate rounds.
 
 ## 3. Dedupe semantics
 
@@ -115,14 +117,17 @@ seriously — it does NOT mechanically raise its severity.
 
 ### Normalizing envelope violations
 
+Each reviewer gets ONE retry for output violations. If the retry also fails,
+STOPPED: blocked — the loop cannot converge without valid verdicts from both
+reviewers. Never downgrade an unparseable result to PASS or non-blocking.
+
 - Unknown/extra fields: drop silently.
 - Both class fields present (severity + structural_class): keep the reviewer's OWN
   lens field, treat the other as noise.
 - Out-of-enum values (e.g. `structural_class: blocking regression`): re-spawn that
-  reviewer ONCE; if it repeats, treat the verdict as FINDINGS-unclassified — which is
-  never gate-blocking — and note it in the final report.
-- Non-YAML output: re-spawn once, then treat as PASS-with-coverage-note; never
-  improvise findings from prose.
+  reviewer ONCE; if it repeats, STOPPED: blocked (invalid output).
+- Non-YAML output: re-spawn once; if still non-YAML, STOPPED: blocked (invalid
+  output). Never improvise findings from prose.
 
 Each lens emits its own `category` subset; the union in §1 is the normalizer's
 accepted set.

@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "dual-review-loop",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Run two independent code reviewers, fix actionable findings, validate, and repeat until the change converges or a bounded stop condition is reached.",
   "author": {
     "name": "zlin101"

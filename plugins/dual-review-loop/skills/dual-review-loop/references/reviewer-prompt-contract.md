@@ -102,18 +102,25 @@ already defines read-only reviewer agents, prefer spawning those.
 
 ## 6. Integrity defenses
 
-- **Reviewer wrote something** (F1): if any write operation is observed from a reviewer,
-  that round's result is untrusted — audit and revert/own whatever was written, treat
-  all prior validation results as invalid, discard both results and re-spawn two fresh
-  reviewers. A discarded round does NOT count against `max_rounds`, and any F-ids
-  assigned in it are reclaimed.
-- **Reviewer chased the main goal** (F2): symptom is fix suggestions turning into
-  implementations, or goal/task/ledger mutations. Same remedy: discard the round,
-  re-spawn with the isolation contract.
+All integrity violations (F1/F2/F3) follow a single bounded retry rule:
+
+- **First violation in a round**: discard the round, re-spawn both reviewers fresh.
+  A discarded round does NOT count against `max_rounds`, and any F-ids assigned in
+  it are reclaimed.
+- **Second violation in the same round**: STOPPED: blocked (integrity failure). The
+  loop cannot converge if reviewers cannot produce valid output within the retry
+  budget.
+
+The three violation types:
+
+- **Reviewer wrote something** (F1): any write operation observed from a reviewer.
+  Also audit and revert/own whatever was written; treat all prior validation results
+  as invalid.
+- **Reviewer chased the main goal** (F2): fix suggestions turning into implementations,
+  or goal/task/ledger mutations.
 - **Reviewer shows prior-round knowledge** (F3, mainly shared-context runtimes): it
-  references earlier rounds, F-ids, or the main thread's plan. Symptom of context
-  bleed. Remedy: discard the round and re-spawn with an explicit fresh-context
-  instruction and no shared history.
-- Prompt contracts and UI metadata (`agents/openai.yaml`) are NOT permission boundaries.
-  Treat runtime enforcement (Claude tool allowlists, Codex sandboxes) as the real
-  boundary where available.
+  references earlier rounds, F-ids, or the main thread's plan.
+
+Prompt contracts and UI metadata (`agents/openai.yaml`) are NOT permission boundaries.
+Treat runtime enforcement (Claude tool allowlists, Codex sandboxes) as the real
+boundary where available.
