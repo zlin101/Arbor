@@ -24,7 +24,7 @@ run on every PR; the behavioral cases here run before a release.
 | E03 Structural regression | LIVE-LOOP | `plant.py <dir> C` | structural `regression` blocks; `improvement`/taste never block convergence | pass (scenario C, pre-v0.2 schema) |
 | E04 Duplicate root cause | LIVE-LOOP | `plant.py <dir> D` | same root cause across lenses → ONE F-id; different root causes at one symbol stay separate | pass (scenario D) |
 | E05 Residual-only | DECISION-PROCEDURE | case R1 below | no gate blocker + residuals → validation RUNS on current tree → PASS (never STOP for want of a fix) | **FAILS on v0.1** (R1) |
-| E06 Cross-boundary regression | LIVE-LOOP | `plant.py <dir> X` (v0.2) | change-caused regression may manifest in untouched code and stays in scope with a causal link; unrelated pre-existing issues stay out | **FAILS on v0.1** (R2) |
+| E06 Cross-boundary regression | LIVE-LOOP | `plant.py <dir> X` | change-caused regression may manifest in untouched code and stays in scope with a causal link; unrelated pre-existing issues stay out | **FAILS on v0.1** (R2; fixture: untouched `report.py` silently corrupted by the changed `get()` contract) |
 | E07 Progress semantics | DECISION-PROCEDURE | cases R3, R4 below | persistent stagnation triggers no-progress; resolved-old + equal-count new (churn) does NOT | **FAILS on v0.1** (R4) |
 | E08 Oscillation | DECISION-PROCEDURE | history in scenario-E transcript | inline↔extract flip-flop → STOPPED oscillation with both trade-offs; no third fix | pass (scenario E) |
 | E09 Reviewer conflict | DECISION-PROCEDURE | synthetic: reviewers disagree on material behavior; one evidence-resolution pass settles it → loop continues; if unresolved → STOPPED conflict | pass (contract text; exercised in H evidence) |
