@@ -42,6 +42,10 @@ policy: non-block); required validation NOT yet executed this session.
   is FALSE (validation unknown) → falls through to `select actionable blockers` →
   no gate blocker, P2 not selected (not low-risk in-scope) → `none actionable → STOP`.
   **Wrong: STOPPED although the change may be convergent.**
+- Empirically confirmed on v0.1 text (2026-09-10, DECISION-PROCEDURE run recorded in
+  `docs/acceptance/transcripts/`): evaluator walked the exact branches — gate false
+  (validation leg unmet), PASS branch unreachable, no validation site reachable,
+  terminal `STOP (blocked / unresolved)`; verdict: "the v0.1 text has a dead-end here".
 - v0.2 required outcome: gate blockers derived first = 0 → validation RUNS on the
   current tree → PASS (validation green) / classify failure (not green). Validation
   is the action that COMPLETES convergence, not a precondition to enter the path.
