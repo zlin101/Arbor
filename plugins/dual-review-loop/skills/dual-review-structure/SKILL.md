@@ -1,6 +1,6 @@
 ---
 name: dual-review-structure
-description: Read-only structural review — code-judo, spaghetti growth, abstractions, canonical layers, type boundaries, regression-vs-improvement classification. Use when asked for a maintainability or structure review of current changes, or as the dual-review-loop structure reviewer.
+description: Read-only structural review — code-judo, spaghetti growth, abstractions, canonical layers, type boundaries, regression-vs-improvement. Use when asked for a structure review of current changes.
 ---
 
 # Dual Review — Structure
