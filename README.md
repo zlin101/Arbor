@@ -9,7 +9,8 @@
 ## Install (Codex)
 
 ```bash
-codex plugin marketplace add zlin101/Arbor
+codex plugin marketplace add zlin101/Arbor          # HTTPS 凭据可用的机器
+codex plugin marketplace add git@github.com:zlin101/Arbor.git  # SSH-only 机器
 codex plugin add dual-review-loop@arbor
 ```
 
