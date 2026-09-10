@@ -19,7 +19,7 @@
 ### QA
 
 - Added `scripts/check_repo.py`: deterministic consistency checker (packaging, protocol files, boundary projections, forbidden fields).
-- Added `tests/test_check_repo.py`: pass/fail coverage for every checker rule.
+- Added `tests/test_check_repo.py`: pass/fail coverage for key checker rules.
 - Added `evals/dual-review-loop/README.md`: central regression eval runbook E01–E10.
 - Added `.github/workflows/validate.yml`: CI runs deterministic checks on PR.
 
