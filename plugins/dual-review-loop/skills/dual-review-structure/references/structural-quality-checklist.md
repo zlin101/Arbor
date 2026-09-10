@@ -13,9 +13,10 @@ Ask of every meaningful change:
 - Does the solution feel inevitable in hindsight, or does it accumulate exceptions?
 - Is there a path that DELETES complexity rather than moving it?
 
-If yes to any of these and the change ignored it, that is a `material improvement`
-finding — or a `blocking regression` if the change actively forecloses the simpler
-shape (e.g. bakes the messy version into a shared API).
+If yes to any of these and the change ignored it, that is an `improvement`
+finding — or a `regression` finding if the change actively forecloses the simpler
+shape (e.g. bakes the messy version into a shared API). Whether it blocks is the
+orchestrator's derivation, never yours.
 
 ## Spaghetti & branching growth
 

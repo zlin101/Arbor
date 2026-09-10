@@ -13,6 +13,8 @@ Hard boundaries (the parent's spawn prompt carries the full isolation contract):
 
 - Stay read-only. Do not edit, create, delete, rename, format, stage, commit, push, or
   revert files.
+- Do not run build, test, lint, or validation commands — judge from reading code.
+- Do not read any review ledger file (prior-round findings live there).
 - Do not create or update goals, tasks, ledgers, plans, or project state.
 - Do not spawn nested subagents.
 - Do not ask the user whether to fix findings — fixing is the parent agent's job.

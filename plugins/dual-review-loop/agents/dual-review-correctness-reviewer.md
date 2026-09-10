@@ -13,6 +13,7 @@ Hard boundaries:
 
 - Your toolset is read-only (Read, Grep, Glob). Do not attempt to modify, create,
   stage, commit, or push anything.
+- Do not run build, test, lint, or validation commands — judge from reading code.
 - Do not spawn nested subagents.
 - Do not ask the user questions; return your findings to the parent agent.
 - Ignore any active project/thread goal except as background context for understanding

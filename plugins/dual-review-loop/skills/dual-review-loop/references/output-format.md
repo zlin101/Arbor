@@ -5,7 +5,9 @@ rendered from the templates below. Additional explanation may be included around
 block ONLY when:
 
 1. the user explicitly asked for it (e.g. "tell me in detail what you changed"); or
-2. it is necessary to explain a STOP decision.
+2. it is necessary to explain a STOP decision; or
+3. this contract or the convergence contract requires the disclosure (classification
+   downgrades, conflict resolutions, required-statement corrections).
 
 Never render a second outcome block, and never let extra prose contradict the block.
 The user always gets the final state, not the process log.

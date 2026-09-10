@@ -12,22 +12,22 @@ scope_type: branch | working-tree | commit-range | files
 base_ref: optional
 baseline_commit: optional
 paths: optional
-include_staged: bool
-include_unstaged: bool
-include_untracked: bool
 ```
 
-Derive it from the user's request:
+Derive it from the user's request (discovery rules — two agents must reach the same
+scope from the same request):
 
-- **Working-tree review** (default when the user points at current work): include
-  staged + unstaged changes, plus relevant untracked files, within the paths the user
-  named (all paths if none named).
-- **Branch / PR review**: baseline is what would actually merge. Prefer the merge-base
-  of the branch and its base (`git merge-base <branch> <base>`) over a naive direct
-  diff between the two tips, which can silently include or exclude unrelated work.
+- **Working-tree review** (default when the user points at current work): staged +
+  unstaged changes, plus untracked files that are imported/referenced by a changed
+  file or share its directory — never ignored-path or generated files. Paths: all,
+  unless the user named some.
+- **Branch / PR review**: baseline is what would actually merge. The base is the
+  user-named base ref, else the PR target, else the repo's default branch; take
+  `git merge-base <branch> <base>` — never a direct tip-to-tip diff.
 - **Commit-range review**: the named range; baseline is the range's first parent.
-- **Explicit files**: exactly the named files; baseline is omitted — reviewers judge
-  current content plus its direct context.
+- **Explicit files**: exactly the named files; there is no diff baseline — causality
+  is judged against the named files' current content and contracts, and loop-generated
+  files still join later rounds (§5).
 
 `baseline_commit` is the frozen anchor. Record it once; never re-derive it after fixes.
 
@@ -77,8 +77,14 @@ untouched: handler calling GetUser() now crashes on the new contract
 
 Untouched code may appear in a finding as:
 
-- manifestation of a change-induced regression;
-- interaction point (caller/callee, configuration, schema, contract compatibility).
+- direct manifestation of a change-induced regression (crash, wrong result, broken
+  contract);
+- ONE interaction hop away: direct callers/callees of changed code, and code whose
+  behavior is fed by configuration or schema values the change reads or writes.
+
+"Materially worsened" means the baseline did not exhibit the problem, or exhibited it
+strictly less severely (evidence required). Beyond one hop, or without a worsening
+comparison, an issue is context — not a finding.
 
 Unrelated pre-existing defects remain OUT of scope — they are context, never
 findings, and `causal_link` must not be used to wrap them into scope.
@@ -95,11 +101,6 @@ next round's full review scope (they are part of `current target change` now).
 
 ## 6. Presenting scope to reviewers
 
-Each round, hand every reviewer the same materialization of the full change:
-
-- the frozen baseline identity (ref/commit),
-- the current diff or changed-file list with contents as available,
-- applicable project instructions.
-
-Do not include previous rounds' findings or conclusions — fresh reviewers get scope,
-project rules, code, and their rubric; nothing else.
+Each round, hand every reviewer the review materialization (§3 of
+`reviewer-prompt-contract.md` — the single definition) of this scope's current state,
+plus that reviewer's own rubric. Nothing else: no prior findings, no fix narratives.

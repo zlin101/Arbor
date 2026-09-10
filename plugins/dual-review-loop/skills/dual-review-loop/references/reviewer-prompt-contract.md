@@ -15,6 +15,8 @@ Scope:
 Hard boundaries:
 - Stay read-only.
 - Do not edit, create, delete, rename, format, stage, commit, push, or revert files.
+- Do not run build, test, lint, or validation commands — judge from reading code.
+- Do not read any review ledger file (prior-round findings live there).
 - Do not create or update goals, tasks, ledgers, plans, or project state.
 - Ignore any active project/thread goal except as background context for understanding the code.
 - Do not continue implementation work.
@@ -23,8 +25,7 @@ Hard boundaries:
 - Return findings to the parent only.
 
 Fresh-review rule:
-- Judge the current code on its own evidence.
-- Do not assume earlier reviewer conclusions were correct.
+- Judge the code solely on its own evidence.
 ```
 
 ## 2. Fresh-context rule
@@ -53,13 +54,11 @@ protocol-level definition, not a runtime object or file:
 ```yaml
 review_materialization:
   scope:
-    type: working-tree | branch | commit-range | files
+    type: working-tree | branch | commit-range | files   # reviewer-facing projection
     baseline: <commit-or-null>       # the frozen baseline identity
     paths: [<path>]
   project_instructions:
     sources: [AGENTS.md, <other applicable project docs>]
-  validation_commands:               # what the project declares; NOT results
-    - <exact project-declared command>
   target_change:
     full_current_materialization: <diff baseline→current + changed-file contents>
 ```
@@ -70,7 +69,8 @@ Rules:
   are NOT part of it (they differ by lens).
 - Next round → re-materialize the CURRENT state against the SAME frozen baseline.
 - NEVER included: prior-round findings, global F-ids, fix narratives, validation
-  results or history, policy profiles.
+  commands or results (validation is orchestrator-owned — reviewers judge from
+  reading code), policy profiles, or any project-required review ledger file.
 
 ## 4. Spawn checklist (main agent, before each round)
 
@@ -79,8 +79,9 @@ Rules:
 - [ ] Structure reviewer told to follow the `dual-review-structure` skill.
 - [ ] Isolation template included verbatim.
 - [ ] Both spawns issued in the SAME turn so they run in parallel.
-- [ ] Output contract stated: the unified YAML verdict envelope (see
-      `finding-schema.md`), findings to the parent only.
+- [ ] Output contract stated: the YAML verdict envelope exactly as defined in
+      THAT reviewer's own skill (not the orchestrator's finding-schema file);
+      findings to the parent only.
 
 ## 5. Runtime adaptation
 
@@ -102,11 +103,17 @@ already defines read-only reviewer agents, prefer spawning those.
 ## 6. Integrity defenses
 
 - **Reviewer wrote something** (F1): if any write operation is observed from a reviewer,
-  that round's result is untrusted — discard both results and re-spawn two fresh
-  reviewers.
+  that round's result is untrusted — audit and revert/own whatever was written, treat
+  all prior validation results as invalid, discard both results and re-spawn two fresh
+  reviewers. A discarded round does NOT count against `max_rounds`, and any F-ids
+  assigned in it are reclaimed.
 - **Reviewer chased the main goal** (F2): symptom is fix suggestions turning into
   implementations, or goal/task/ledger mutations. Same remedy: discard the round,
   re-spawn with the isolation contract.
+- **Reviewer shows prior-round knowledge** (F3, mainly shared-context runtimes): it
+  references earlier rounds, F-ids, or the main thread's plan. Symptom of context
+  bleed. Remedy: discard the round and re-spawn with an explicit fresh-context
+  instruction and no shared history.
 - Prompt contracts and UI metadata (`agents/openai.yaml`) are NOT permission boundaries.
   Treat runtime enforcement (Claude tool allowlists, Codex sandboxes) as the real
   boundary where available.

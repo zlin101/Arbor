@@ -19,8 +19,10 @@ gate effect from this fixed table:
 | structure `regression` | **BLOCK** | BLOCK |
 | structure `improvement` | RESIDUAL | **BLOCK** |
 
-- Strict profile applies only when the user explicitly asked (`strict` /
-  `zero findings` / `fix everything reasonable`).
+- Strict profile applies only when the user explicitly asked for a zero-findings-grade
+  bar (`strict`, `zero findings`, `fix everything reasonable`, or an equivalent
+  meaning). If the request is unclear, use the default profile and state that choice
+  in the final report.
 - **P2 default posture**: fix when direct, low-risk, and clearly inside the current
   change; otherwise record as residual.
 - **P3**: never auto-fixed, never blocks PASS on either profile.
@@ -29,39 +31,58 @@ gate effect from this fixed table:
   is the correct verdict even when further polish is imaginable.
 
 **Classification audit (main agent).** A classification counts as its evidence states.
-`structure: regression` blocks only if the evidence names concrete material worsening
-introduced by THIS change (new spaghetti, boundary leak, duplicated canonical logic)
-relative to the baseline. If the classification is unsupported — the cited
-"regression" contradicts a previous round's demand, describes a pre-existing condition,
-or is preference phrased as regression — run ONE evidence-resolution pass; if the
-evidence settles it, downgrade the classification (never upgrade) and say so in the
-final report; if it does not settle it, STOP as an unresolved reviewer conflict.
+The audit applies to EVERY BLOCK-producing classification: correctness P0/P1, structure
+`regression`, and — under the strict profile — correctness P2 and structure
+`improvement`. A blocking classification must cite CURRENT-tree evidence naming the
+concrete problem this change introduced or materially worsened; the audit must rest on
+that evidence only — never on consistency with a previous round's demands (that
+comparison belongs to the oscillation guard). Downgrade targets: P0→P1→P2 and
+`regression`→`improvement`; under strict, an `improvement` whose payoff is below the
+finding bar is downgraded to a `residual_risks` line. Never upgrade. If the evidence
+looks unsupported, run the ONE evidence-resolution pass (the same single pass §5
+budgets for conflicts, per finding); if the evidence settles it, downgrade and disclose
+the downgrade in the final report; if it does not settle it, STOP as an unresolved
+reviewer conflict.
 
 ## 2. Convergence gate (PASS)
 
-Evaluate in order. Gate **blockers** are the finding-side and conflict-side conditions
-only; validation is the action that COMPLETES convergence, not a precondition to enter
-the path:
+Evaluate in order. Gate **blockers** are the finding-side conditions only; validation
+is the action that COMPLETES convergence, not a precondition to enter the path.
+Conflicts never reach the gate — the conflict stop fires upstream during resolution:
 
 ```text
 gate blockers =
     open correctness P0/P1 findings (BLOCK row above)
   + open structural regressions (BLOCK row above)
   + strict-profile extras (P2 / improvement, when strict is active)
-  + unresolved material reviewer conflict
+
+"open" = lifecycle OPEN (not RESOLVED, not WAIVED; BLOCKED findings exit via the
+blocked path, they do not linger as gate blockers)
 
 if gate blockers == 0:
-    ensure validation is current (see §4); run it if not
-    green        → PASS (residual findings recorded, never blocking)
-    not green    → classify the failure per §4
+    ensure validation is CURRENT and at gate level (§4); run it if not
+    green                    → PASS (residual findings recorded, never blocking)
+    red, pre-existing and not blocking correctness
+                             → PASS, with the failing line rendered as
+                               `<command>: FAIL (pre-existing, residual validation risk)`
+    red, blocks confirming correctness or caused by the change
+                             → §4 failure handling (repair, or STOP BLOCKED)
+    no validation declared by the project and none discoverable
+                             → the validation condition is satisfied vacuously;
+                               render `none declared by project`
 else:
     stop guards (§5) → actionable findings (§3) → fix batch → validate → fresh round
 ```
 
-PASS therefore requires: gate blockers == 0 AND validation green **on the current
-tree**. A clean round-1 (both reviewers PASS) follows the same path — validation runs,
-then PASS. A residual-only round-1 (only non-blocking findings) is the same path; it
-must never terminate as STOP for lack of something to fix.
+PASS therefore requires: gate blockers == 0 AND validation green on the current tree —
+OR the two sanctioned red/vacuous passes above, both explicitly rendered. A clean
+round-1 (both reviewers PASS) follows the same path; so does a residual-only round-1:
+it must never terminate as STOP for lack of something to fix.
+
+At gate-zero, remaining P2/P3 findings and structural `improvement`s are recorded as
+residual — P2s are fixable only inside a batch triggered by a blocking finding, never
+as a post-gate fix (a post-gate write would invalidate validation and restart the
+round).
 
 ## 3. Fix policy
 
@@ -81,6 +102,10 @@ and oscillates on local optima.
 - **Minimal but not artificially tiny**: correctness fixes are the smallest safe
   root-cause fix. Structure fixes may exceed one function but must directly serve this
   change's maintainability — the loop is not a repo-wide refactor vehicle.
+- **Fixes must read as if written blind.** Never embed finding ids, reviewer
+  feedback, or round history in code, comments, test names, or commit-adjacent text —
+  fresh reviewers read changed-file contents and any such narrative leaks prior rounds
+  into their context.
 - **Forbidden automatic actions** (unless the user explicitly asked): commit, amend,
   push, merge, create PR, delete branch, destructive reset/revert, touching unrelated
   user work.
@@ -98,11 +123,13 @@ The plugin has NO language and NO default test command. `go test`, `pytest`,
 `npm test`, `cargo test` are the target project's business, discovered from its rules
 and files — never assumed.
 
-**Freshness**: a validation result is current ONLY if no repository write has occurred
-since that command completed. Any write (including the loop's own fixes) invalidates
-prior results; when gate blockers reach zero and no current result exists, run the
-required validation before PASS. This is internal orchestrator state — reviewers are
-never told validation results or history.
+**Freshness and level**: a validation result is current ONLY if no repository write
+has occurred since that command completed. Any write (including the loop's own fixes,
+and any write observed from a reviewer) invalidates prior results. Intermediate rounds
+may run targeted validation (priority 3); the gate-time check at zero blockers must
+satisfy priority 4 — the project's required/full validation — before PASS. This is
+internal orchestrator state — reviewers are never told validation commands, results,
+or history.
 
 **If validation fails:**
 
@@ -123,12 +150,16 @@ no_progress_rounds: 2
 
 | Condition | Detection | Action |
 |---|---|---|
-| PASS | gate blockers == 0 AND validation green on the current tree | final PASS report |
-| max rounds | `max_rounds` reached with gate blockers open | STOPPED, list open blockers |
+| PASS | gate blockers == 0 AND validation green (or sanctioned red/vacuous pass, §2) on the current tree | final PASS report |
+| max rounds | `max_rounds` reached with gate blockers open | STOPPED, list open blockers; findings fixed by the last round but not yet re-reviewed are listed as `fixed, pending review confirmation` |
 | no progress | stagnation (defined below) sustained for `no_progress_rounds` consecutive comparable rounds | STOPPED, reason `no progress` |
-| oscillation | design flip-flops between two directions (e.g. round N demands an abstraction, round N+1 demands its removal, round N+2 returns to the original) | STOPPED, present both directions' trade-offs, hand back to the user |
+| oscillation | the main agent's OWN fix directions for the SAME design question flip between two answers across three comparable rounds (N demands X, N+1 demands not-X, N+2 returns to X) | STOPPED, present both directions' trade-offs, hand back to the user |
 | permission boundary | fix requires destructive action, external write, or API/security/deployment authorization the loop does not have | STOPPED, reason `permission boundary` |
-| reviewer conflict | reviewers disagree on material behavior/architecture, or a classification cannot be settled by the §1 evidence-resolution pass | ONE resolution pass; if still undecidable → BLOCKED, STOPPED. Never decide by majority vote |
+| reviewer conflict | reviewers disagree on material behavior/architecture, or a classification cannot be settled by the §1 evidence-resolution pass | ONE resolution pass; if still undecidable → STOPPED, reason `unresolved conflict`, presenting both positions |
+
+PASS is evaluated first. The guards apply only when gate blockers > 0 (or validation
+has not yet sanctioned the round): a round meeting the PASS condition reports PASS
+even if a guard's pattern is also detectable.
 
 ### Progress semantics
 
@@ -153,6 +184,9 @@ new        = current − previous    # first surfacing this round (churn)
 
 **Guard precedence**: when several stop conditions fire in the same round, evaluate in
 this order and use the first match as the report's `Reason:` (listing any others in
-`What was tried` if material): oscillation → permission boundary → reviewer conflict →
-no progress → max rounds. Guards override the fix policy: once a stop condition fires,
-no further fixes are applied, even ones the fix order would rank as actionable.
+`What was tried` if material): blocked (validation failure blocking correctness, or
+nothing actionable and a human decision/permission is missing) → oscillation →
+permission boundary → unresolved conflict → no progress → max rounds. Guards override
+the fix policy: once a stop condition fires, no further fixes are applied, even ones
+the fix order would rank as actionable. Churn counts as progress for the counter;
+stagnation alone triggers no-progress.
