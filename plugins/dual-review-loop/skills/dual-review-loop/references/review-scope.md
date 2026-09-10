@@ -61,15 +61,32 @@ only the diff produced by the previous fix round
 That narrowing is the primary cause of fake convergence (a fix can regress code the
 narrow diff no longer contains).
 
-## 4. Changed scope vs context scope
+## 4. Scope ownership is causality-based, not location-based
 
-- **Changed scope**: the target change under review. Findings may only be raised
-  against it.
-- **Context scope**: unmodified files, callers, contracts, and tests read to
-  understand the change.
+> **A finding is in scope iff it is causally attributable to the target change.**
 
-Reviewers may widen the context scope freely. They may not widen the changed scope,
-move the product goal, or raise findings against untouched code except as background.
+Whether the change CAUSED or materially worsened the problem is the ownership
+question — not whether the problem happens to sit on a changed line. The two must
+never be conflated:
+
+```text
+changed:   service.GetUser() return semantics modified
+untouched: handler calling GetUser() now crashes on the new contract
+→ the crash IS in scope: manifestation in untouched code, cause in the change.
+```
+
+Untouched code may appear in a finding as:
+
+- manifestation of a change-induced regression;
+- interaction point (caller/callee, configuration, schema, contract compatibility).
+
+Unrelated pre-existing defects remain OUT of scope — they are context, never
+findings, and `causal_link` must not be used to wrap them into scope.
+
+When a finding's `location` is in untouched code, `causal_link` is REQUIRED and must
+name the changed code that causes or materially worsens it (see finding-schema.md).
+
+This is not a license for repo-wide review: findings still must trace to the change.
 
 ## 5. Loop-generated files
 

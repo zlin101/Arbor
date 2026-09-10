@@ -32,22 +32,28 @@ correct.
 
 ## 3. Scope discipline
 
-- Raise findings only against code the change adds or modifies.
-- Pre-existing issues in untouched code are context, not findings.
+- **A finding is in scope iff it is causally attributable to the target change.**
+  A regression the change introduces may manifest in code the change does not touch —
+  an untouched caller crashing on a changed contract is IN scope. When a finding's
+  location is untouched code, set `causal_link` naming the changed code that causes it.
+- Unrelated pre-existing defects (present before this change, not worsened by it) are
+  context, not findings.
 - Never report with unfinished research: if the codebase contains the answer (the other
   half of a suspicious client/server split, an existing guard, a test), check it before
   reporting.
 
 ## 4. Severity model
 
-| Level | Meaning | blocking |
-|-------|---------|----------|
-| **P0** | Security vulnerability, data-loss risk, correctness bug that must not ship | `true` |
-| **P1** | Logic error, behavior regression, race, significant performance regression | `true` |
-| **P2** | Code smell or minor defect that does not directly endanger this change | `false` (only `true` when it directly endangers this change's correctness) |
-| **P3** | Optional improvement | `false` |
+| Level | Meaning |
+|-------|---------|
+| **P0** | Security vulnerability, data-loss risk, correctness bug that must not ship |
+| **P1** | Logic error, behavior regression, race, significant performance regression |
+| **P2** | Code smell or minor defect that does not directly endanger this change |
+| **P3** | Optional improvement |
 
-Never inflate severity. Over-reporting destroys the reviewer's usefulness — trace each
+Severity is your classification of the defect. Whether a finding blocks convergence is
+derived by the orchestrator from its policy table — you do not emit blocking state.
+Never inflate severity: over-reporting destroys the reviewer's usefulness — trace each
 finding end-to-end before assigning P0/P1.
 
 ## 5. What to examine
@@ -97,12 +103,12 @@ verdict: PASS | FINDINGS
 findings:
   - local_id: C1
     severity: P0 | P1 | P2 | P3
-    blocking: true | false
     category: correctness | security | reliability | performance | tests | architecture | other
     location:
       file: path/to/file
       line: optional
       symbol: optional
+    causal_link: optional   # REQUIRED when location is in untouched code
     title: concise title
     problem: what is wrong
     evidence: concrete evidence from code/behavior

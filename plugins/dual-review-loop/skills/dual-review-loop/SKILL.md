@@ -14,7 +14,7 @@ until the change converges or a bounded stop fires.
 - **Scope source** from the user's request: working tree (default), branch vs base,
   commit range, or explicit files — resolved per `references/review-scope.md`.
 - Optional explicit overrides, honored only when the user states them: `strict`
-  (P2 joins the convergence gate), `max_rounds`.
+  (P2 and structural improvements join the convergence gate), `max_rounds`.
 - Everything else comes from the contracts below. Precedence: user's explicit
   instruction > target project instructions (`AGENTS.md` and equivalents) > this
   skill's defaults. Never bypass project rules.
@@ -40,19 +40,26 @@ for round in 1..max_rounds:
     collect unified YAML verdicts
     normalize + root-cause dedupe + assign F-ids + map to previous round
         (see finding-schema.md)
-    if convergence gate met AND required validation green (see convergence-contract.md):
-        run final required validation if not yet run → report PASS (see output-format.md); done
-    select actionable blockers (P0 → P1 → structural blockers → low-risk in-scope P2)
+    resolve material reviewer conflicts: ONE evidence pass; if still undecidable
+        → STOP (conflict). audit classifications against evidence; downgrade only
+    derive gate blockers from the policy table (convergence-contract.md §1;
+        strict profile only if the user asked)
+    if gate blockers == 0:
+        ensure validation is CURRENT (no write since it last ran); run it now if not
+        green     → report PASS (see output-format.md); done
+        not green → classify the failure per the validation contract → done or repair
+    select actionable FINDINGS (P0 → P1 → structural regressions → low-risk in-scope P2)
     if none actionable → STOP (blocked / unresolved)
-    if oscillation detected → STOP (present both trade-offs)
+    if a stop guard fires → STOP per the precedence table (convergence-contract.md §5)
     apply ONE coherent root-cause fix batch           # you are the only writer
     run project validation (project's own commands; repair or revert YOUR fix if it regressed)
-    update no-progress counter (blocking set shrank? validation improved?)
-    if no_progress >= 2 → STOP (no progress)
+    update progress: persistent / resolved / new (convergence-contract.md §5)
+    if stagnation sustained → STOP (no progress)
 ```
 
-Round 1 special case: if both reviewers return PASS, run the required validation once,
-then PASS — no fixes, no modifications.
+Validation is the action that COMPLETES convergence: when gate blockers reach zero,
+run the required validation on the current tree — never STOP for lack of a fix while
+validation is still unrun.
 
 ## Guards
 
@@ -60,8 +67,8 @@ Defaults: `max_rounds: 3`, `no_progress_rounds: 2` (user may override explicitly
 
 | Stop on | Meaning |
 |---|---|
-| max rounds | rounds exhausted with blockers open |
-| no progress | 2 consecutive rounds without the blocking set shrinking or validation improving |
+| max rounds | rounds exhausted with gate blockers open |
+| no progress | stagnation sustained: persistent blockers unimproved AND validation not improving (resolved-old + equal-count new blockers is churn, not stagnation) |
 | oscillation | design flip-flopping between two directions — stop, present trade-offs, hand back |
 | permission boundary | fix needs destructive action / external write / authorization the loop lacks |
 | reviewer conflict | material disagreement unresolved after ONE evidence-resolution pass — never majority vote |

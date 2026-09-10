@@ -1,6 +1,6 @@
 ---
 name: dual-review-structure
-description: Read-only structural review — code-judo, spaghetti growth, abstractions, canonical layers, type boundaries, blocking-vs-taste discipline. Use when asked for a maintainability or structure review of current changes, or as the dual-review-loop structure reviewer.
+description: Read-only structural review — code-judo, spaghetti growth, abstractions, canonical layers, type boundaries, regression-vs-improvement classification. Use when asked for a maintainability or structure review of current changes, or as the dual-review-loop structure reviewer.
 ---
 
 # Dual Review — Structure
@@ -57,25 +57,30 @@ got worse (concept count, coupling, tangling, mixed responsibilities), not merel
 the file is long. A well-organized large file is not a finding; a 300-line tangle can
 be.
 
-## 5. Convergence discipline (mandatory)
+## 5. Classification (mandatory)
 
-Classify EVERY finding with a `discipline:` field:
+Classify EVERY finding with a `structural_class:` field:
 
-| discipline | meaning | blocking |
-|------------|---------|----------|
-| `blocking regression` | the change makes structure materially worse — new spaghetti, boundary leak, duplicated canonical logic | `true`, severity P1 |
-| `material improvement` | clear, actionable, behavior-preserving simplification directly serving this change | `false`, severity P2 |
-| `taste` | would be nicer, but no material regression and no clear payoff | do NOT report as a finding — at most one aggregate line under `residual_risks` |
+| structural_class | meaning |
+|------------------|---------|
+| `regression` | the change makes structure materially worse — new spaghetti, boundary leak, duplicated canonical logic. Evidence MUST name the concrete worsening this diff introduced |
+| `improvement` | clear, actionable, behavior-preserving simplification directly serving this change |
 
-**You cannot stop convergence with taste.** If the change introduces no structural
-regression, `verdict: PASS` is the correct answer even when further polish is
-imaginable. Do not keep inventing demands to avoid PASS.
+**You cannot stop convergence with taste.** Taste — would-be-nicer with no material
+regression and no clear payoff — is NOT a `structural_class` and must NOT be reported
+as a finding; at most one aggregate line under `residual_risks`. If the change
+introduces no structural regression, `verdict: PASS` is the correct answer even when
+further polish is imaginable. Do not keep inventing demands to avoid PASS.
 
-## 6. Severity mapping
+Whether a finding blocks convergence is derived by the orchestrator from its policy
+table — you do not emit blocking state.
 
-- P1 — `blocking regression` (the only blocking case).
-- P2 — `material improvement`.
-- P3 — rare: a taste item you judged worth surfacing anyway (prefer `residual_risks`).
+## 6. Classification discipline
+
+- `regression` demands proof: the evidence must show the structure is worse THAN THE
+  BASELINE because of this diff, not that it could be nicer.
+- `improvement` is for behavior-preserving wins with clear payoff; everything weaker
+  stays in `residual_risks`.
 
 ## 7. Output contract
 
@@ -86,14 +91,13 @@ reviewer: structure
 verdict: PASS | FINDINGS
 findings:
   - local_id: S1
-    severity: P1 | P2 | P3
-    blocking: true | false
+    structural_class: regression | improvement
     category: architecture | maintainability | abstraction | complexity | types | other
-    discipline: blocking regression | material improvement | taste
     location:
       file: path/to/file
       line: optional
       symbol: optional
+    causal_link: optional   # REQUIRED when location is in untouched code
     title: concise title
     problem: what is wrong structurally, and why the change made it worse
     evidence: concrete evidence from code
@@ -104,7 +108,7 @@ residual_risks: []
 ```
 
 `local_id` is yours alone (S1, S2, …); the parent assigns global ids and merges
-duplicates. Note `problem` for a blocking regression must state why THIS diff worsened
+duplicates. Note `problem` for a `regression` must state why THIS diff worsened
 the structure — not describe the file's general state.
 
 ## 8. Out of role
