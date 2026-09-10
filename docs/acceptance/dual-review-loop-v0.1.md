@@ -6,11 +6,15 @@ extracted from session JSONL). Summary below; waiver for the plugin-eval budget
 finding: `plugin-eval-budget-waiver.md`.
 
 **Fixture reproduction**: the /tmp fixtures are ephemeral; `fixtures/plant.py`
-rebuilds any scenario's exact at-plant-time starting state (content-verified against
-the 2026-09-09/10 session records: `python3 docs/acceptance/fixtures/plant.py
-/tmp/repro A B C D E J` — each scenario builds a fresh git repo, applies the planted
-working-tree change, and its `python3 test_store.py` exits 0). After a scenario's loop
-run, `git diff HEAD` shows exactly what the reviewers saw.
+rebuilds the LIVE-LOOP scenarios' exact at-plant-time starting states (content-
+verified against the 2026-09-09/10 session records). `python3
+docs/acceptance/fixtures/plant.py <target-root> A B C D H J` creates one INDEPENDENT
+git repo per scenario at `<target-root>/<scenario>/` (single "base store" commit =
+frozen baseline; the planted change sits as an UNCOMMITTED working-tree diff, so
+`git diff HEAD` is exactly what the reviewers saw; `python3 test_store.py` exits 0).
+Fixture-backed scenarios: A, B, C, D, H, J. Scenarios E, I, J-prime, J-double-prime
+are DECISION-PROCEDURE runs with NO fixture — their synthetic histories are stated
+inline in their transcripts.
 
 Environment: codex-cli 0.153.4 (local), Claude Code (local), fixture repo
 `/tmp/arbor-acceptance/fixture*` (base commit 28c4eb4, `store.py` + `test_store.py`
@@ -78,9 +82,9 @@ Loop drivers were fresh-context agents; reviewers were fresh parallel subagents 
   precedence applied; J″: max-rounds proven as SOLE firing guard with deterministic
   terminal state; J: predicate precision live — budget exhaustion with zero blockers
   does NOT fire the row; J′: precedence "no progress → max rounds" exercised) ·
-  no-progress guard verified ✔ (I live-arithmetic: fires after 2 consecutive
-  non-shrinking rounds, round-1 exemption explicit; J′/J″ counter walks) ·
-  oscillation guard verified ✔ (E). Evidence classes (LIVE-LOOP vs DECISION-PROCEDURE)
+  no-progress guard verified ✔ (I, DECISION-PROCEDURE arithmetic: fires after 2
+  consecutive non-shrinking rounds, round-1 exemption explicit; J′/J″ counter walks) ·
+  oscillation guard verified ✔ (E, DECISION-PROCEDURE). Evidence classes (LIVE-LOOP vs DECISION-PROCEDURE)
   are labeled per scenario in the table above and in `transcripts/INDEX.md`; live and
   decision-procedure evidence are not conflated.
 - Portability: no Iris paths ✔ · no fixed branch names ✔ · no fixed language/test
@@ -99,8 +103,10 @@ Loop drivers were fresh-context agents; reviewers were fresh parallel subagents 
    plugin-level `deferred_cost_tokens` band (~13k vs population baseline) —
    **formally waived** — `plugin-eval-budget-waiver.md` (the deferred bucket IS the
    spec §8–§21 contract documentation, 12+ even components; per-round load is bounded
-   by progressive disclosure; all trigger/invoke surfaces are in "good" bands).
-   Re-measure with observed usage in v0.2.
+   by progressive disclosure; invoke surfaces are "good", trigger surfaces "moderate" —
+   in-band, below the heavy threshold where budget fails fire). Analyzer numbers are
+   point-in-time (measured 2026-09-10 at HEAD) and drift with contract text; the
+   waiver states the reproduction commands. Re-measure with observed usage in v0.2.
 2. Isolation on Codex is prompt-contract only (agent TOMLs are user config, not
    installable by plugins); Claude Code runtime-enforces via tool allowlists. Scenario G
    passed under prompt-contract conditions.

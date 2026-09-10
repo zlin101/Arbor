@@ -866,15 +866,18 @@ First acceptance review returned 暂不通过 with five blockers. Dispositions:
    rewritten: shared root cause is the ONLY merge condition; symbol/boundary/risk are
    supporting indicators, never sufficient. Matches scenario D's audited behavior.
 3. **plugin-eval 1 fail (deferred_cost_tokens)** → formal waiver
-   `docs/acceptance/plugin-eval-budget-waiver.md`: trigger/invoke = 0 (good);
-   13,078 deferred tokens are the contract docs themselves (12+ even components);
-   reaching the ≤1,600 band means deleting ~88% of spec §8–§21 implementation.
-   Re-measure with observed usage in v0.2.
-4. **max_rounds / no-progress lacked run evidence** → added scenario H (live loop,
+   `docs/acceptance/plugin-eval-budget-waiver.md` — that document is the single source
+   of truth for analyzer numbers (point-in-time, dated; do not duplicate them here).
+   Rationale: the deferred bucket is the contract documentation itself (spec §8–§21);
+   reaching the band would delete most of it. Re-measure with observed usage in v0.2.
+4. **max_rounds / no-progress lacked run evidence** → added scenarios H (live loop,
    `max_rounds: 1`, unresolvable-in-loop contract bug under AGENTS.md policy rules →
-   expected STOPPED with open blocker) and scenario I (no-progress counter arithmetic
-   applied to a 4-round synthetic history → STOPPED no progress), transcripts in the
-   same directory. Scenario E already provided live oscillation + max-rounds co-fire.
+   STOPPED 1/1, precedence applied) and I (no-progress counter arithmetic applied to a
+   4-round synthetic history → STOPPED no progress; DECISION-PROCEDURE evidence class),
+   transcripts in the same directory. Scenario E — oscillation guard — is also
+   DECISION-PROCEDURE evidence (contract applied to a synthetic flip-flop history; no
+   fixture, no reviewer spawns). Max-rounds causal evidence later strengthened by
+   J/J′/J″ (see acceptance doc).
 5. **Task 8 metadata grep false-positive** → check now scopes `skills/` + `agents/`
    only (THIRD_PARTY_NOTICES.md attribution prose is legitimately out of scope).
 

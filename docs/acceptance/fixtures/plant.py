@@ -2,15 +2,20 @@
 """Rebuild the acceptance fixtures for dual-review-loop v0.1 scenarios.
 
 Usage:
-    python3 plant.py <target-dir> <scenario> [<scenario> ...]
+    python3 plant.py <target-root> <scenario> [<scenario> ...]
 
-Scenarios: A B C D E J  (see docs/acceptance/dual-review-loop-v0.1.md)
+Scenarios with a fixture: A B C D H J   (one letter = one scenario in
+docs/acceptance/dual-review-loop-v0.1.md). Scenarios E, I, J-prime and
+J-double-prime are DECISION-PROCEDURE runs with NO fixture — their synthetic
+histories are stated inline in docs/acceptance/transcripts/scenario-*.md.
 
-Creates <target-dir> as a fresh git repo (branch main, one commit "base store"),
-then applies each scenario's planted working-tree change on top. The loop under
-test never commits, so after a scenario run `git diff HEAD` is exactly the change
-the reviewers saw. Base content and every planted string are verbatim from the
-2026-09-09/10 acceptance runs.
+For EACH requested scenario this script creates a SEPARATE fresh git repo at
+    <target-root>/<SCENARIO>/      (branch main, one commit "base store")
+and applies that scenario's planted working-tree change on top. Directories are
+never shared between scenarios, so N scenarios yield N independent fixtures.
+The loop under test never commits, so after a scenario run `git diff HEAD` is
+exactly the change the reviewers saw. Base content and every planted string are
+verbatim from the 2026-09-09/10 acceptance runs.
 """
 import pathlib
 import subprocess
@@ -77,7 +82,8 @@ AGENTS_BASE = '''# Project Instructions
 - Python 3 standard library only. No new dependencies.
 '''
 
-AGENTS_E_EXTRA = '''- The `ttl` parameter on `Store.set` is a committed v2 API contract: it must remain
+# Scenario H's fixture (ttl contract bug); scenario E itself has NO fixture.
+AGENTS_H_EXTRA = '''- The `ttl` parameter on `Store.set` is a committed v2 API contract: it must remain
   accepted and must eventually work. Removing it, or silently ignoring caller-supplied
   values, is not an acceptable resolution.
 - Never invent product policy. If a fix requires a product decision this repository
@@ -179,7 +185,7 @@ PLANTS = {
 
     def test_delete(self):''')],
     },
-    "E": {
+    "H": {
         "store": [('''    def set(self, key, value):
         self._data[key] = value
         self.audit.append(("set", key))''',
@@ -194,7 +200,7 @@ PLANTS = {
         self.assertEqual(s.get("a"), 1)
 
     def test_delete(self):''')],
-        "agents": AGENTS_E_EXTRA,
+        "agents": AGENTS_H_EXTRA,
     },
     "J": {
         "store": [('''    def delete(self, key):''',
@@ -239,10 +245,14 @@ def run(*cmd, cwd):
     subprocess.run(cmd, check=True, cwd=cwd, capture_output=True, text=True)
 
 
-def build(target: pathlib.Path, scenarios):
+def build_scenario(root: pathlib.Path, scenario: str):
+    """Create <root>/<scenario>/ as an independent fixture repo."""
+    target = root / scenario
     if target.exists():
         sys.exit(f"refusing to overwrite existing {target}")
     target.mkdir(parents=True)
+    plant = PLANTS[scenario]
+    # 1. pristine base, committed — this is the frozen baseline the loop freezes.
     (target / "store.py").write_text(BASE_STORE)
     (target / "test_store.py").write_text(BASE_TESTS)
     (target / "AGENTS.md").write_text(AGENTS_BASE)
@@ -250,26 +260,34 @@ def build(target: pathlib.Path, scenarios):
     run("git", "add", "-A", cwd=target)
     run("git", "-c", "user.email=plant@local", "-c", "user.name=plant",
         "commit", "-qm", "base store", cwd=target)
-    for sc in scenarios:
-        plant = PLANTS[sc]
-        store, tests = BASE_STORE, BASE_TESTS
-        for old, new in plant["store"]:
-            assert old in store, f"scenario {sc}: store anchor missing"
-            store = store.replace(old, new, 1)
-        for old, new in plant["tests"]:
-            assert old in tests, f"scenario {sc}: tests anchor missing"
-            tests = tests.replace(old, new, 1)
-        (target / "store.py").write_text(store)
-        (target / "test_store.py").write_text(tests)
-        if plant.get("agents"):
-            agents = AGENTS_BASE.replace(
-                "## Rules", "## Rules\n" + plant["agents"].rstrip("\n"), 1)
-            (target / "AGENTS.md").write_text(agents)
+    # 2. planted change as an UNCOMMITTED working-tree modification, so
+    #    `git diff HEAD` is exactly what the reviewers saw.
+    store, tests = BASE_STORE, BASE_TESTS
+    for old, new in plant["store"]:
+        assert old in store, f"scenario {scenario}: store anchor missing"
+        store = store.replace(old, new, 1)
+    for old, new in plant["tests"]:
+        assert old in tests, f"scenario {scenario}: tests anchor missing"
+        tests = tests.replace(old, new, 1)
+    (target / "store.py").write_text(store)
+    (target / "test_store.py").write_text(tests)
+    agents = AGENTS_BASE
+    if plant.get("agents"):
+        agents = agents.replace("## Rules", "## Rules\n" + plant["agents"].rstrip("\n"), 1)
+    (target / "AGENTS.md").write_text(agents)
     run("python3", "test_store.py", cwd=target)  # must exit 0
-    print(f"built {target} with scenarios {'+'.join(scenarios)}; validation green")
+    return target
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         sys.exit(__doc__)
-    build(pathlib.Path(sys.argv[1]), [s.upper() for s in sys.argv[2:]])
+    root = pathlib.Path(sys.argv[1])
+    scenarios = [s.upper() for s in sys.argv[2:]]
+    unknown = [s for s in scenarios if s not in PLANTS]
+    if unknown:
+        sys.exit(f"unknown scenarios {unknown}; fixture-backed: {sorted(PLANTS)}")
+    built = [build_scenario(root, s) for s in scenarios]
+    print("built independent fixtures:")
+    for p in built:
+        print(f"  {p}")
