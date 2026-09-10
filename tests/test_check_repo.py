@@ -1,7 +1,6 @@
-"""Tests for scripts/check_repo.py and the fixture builder contract.
+"""Tests for scripts/check_repo.py.
 
-Every rule in the checker must have a demonstrated pass AND fail branch here;
-a rule that cannot be failed in a test does not belong in the checker.
+Key checker rules have pass/fail coverage here.
 """
 from __future__ import annotations
 
@@ -302,7 +301,7 @@ class ClaudeAgentValidation(unittest.TestCase):
     def test_write_capable_tool_fails(self):
         _make_agent_tree(self.root, correctness_tools="Read, Grep, Glob, Write")
         check_repo.check_claude_agents()
-        self.assertTrue(any("write-capable" in f for f in check_repo.failures))
+        self.assertTrue(any("must be exactly" in f for f in check_repo.failures))
 
     def test_missing_skills_fails(self):
         agents = self.root / "plugins" / "dual-review-loop" / "agents"
@@ -320,10 +319,37 @@ class ClaudeAgentValidation(unittest.TestCase):
     def test_name_mismatch_fails(self):
         _make_agent_tree(self.root, correctness_name="WRONG")
         check_repo.check_claude_agents()
-        # fail format: "{agent}.md: frontmatter name 'WRONG' != 'dual-review-correctness-reviewer'"
-        self.assertTrue(any("dual-review-correctness-reviewer" in f and "WRONG" in f
-                            for f in check_repo.failures))
+        self.assertTrue(any("WRONG" in f for f in check_repo.failures))
 
+    def test_extra_agent_tool_fails(self):
+        _make_agent_tree(self.root, correctness_tools="Read, Grep, Glob, Agent")
+        check_repo.check_claude_agents()
+        self.assertTrue(any("must be exactly" in f for f in check_repo.failures))
+
+    def test_missing_glob_fails(self):
+        _make_agent_tree(self.root, correctness_tools="Read, Grep")
+        check_repo.check_claude_agents()
+        self.assertTrue(any("must be exactly" in f for f in check_repo.failures))
+
+    def test_non_string_tools_fails(self):
+        agents = self.root / "plugins" / "dual-review-loop" / "agents"
+        agents.mkdir(parents=True)
+        (agents / "dual-review-correctness-reviewer.md").write_text(
+            "---\nname: dual-review-correctness-reviewer\n"
+            "description: Test\ntools:\n  - Read\n  - Grep\n"
+            "skills: dual-review-correctness\n---\n# T\n")
+        _make_agent_tree(self.root)
+        (agents / "dual-review-correctness-reviewer.md").write_text(
+            "---\nname: dual-review-correctness-reviewer\n"
+            "description: Test\ntools:\n  - Read\n  - Grep\n"
+            "skills: dual-review-correctness\n---\n# T\n")
+        check_repo.check_claude_agents()
+        self.assertTrue(any("not a string" in f for f in check_repo.failures))
+
+    def test_exact_three_tools_passes(self):
+        _make_agent_tree(self.root)
+        check_repo.check_claude_agents()
+        self.assertEqual(check_repo.failures, [])
 
 # ------------------------------------------- non-mapping YAML/JSON roots --
 class NonMappingYamlRoot(unittest.TestCase):

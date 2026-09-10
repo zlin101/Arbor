@@ -214,11 +214,15 @@ def check_claude_agents() -> None:
             fail(f"{agent}.md: frontmatter 'skills' missing")
         elif actual_skill != expected_skill:
             fail(f"{agent}.md: skills {actual_skill!r} != {expected_skill!r}")
-        tools = fm.get("tools", "")
-        if "Read" not in tools or "Grep" not in tools or "Glob" not in tools:
-            fail(f"{agent}.md: tools missing Read/Grep/Glob (got {tools!r})")
-        if "Write" in tools or "Bash" in tools or "Edit" in tools:
-            fail(f"{agent}.md: tools includes write-capable tool (got {tools!r})")
+        tools_raw = fm.get("tools")
+        if not isinstance(tools_raw, str):
+            fail(f"{agent}.md: 'tools' is not a string (got {type(tools_raw).__name__})")
+        else:
+            actual_tools = {t.strip() for t in tools_raw.split(",") if t.strip()}
+            expected_tools = {"Read", "Grep", "Glob"}
+            if actual_tools != expected_tools:
+                fail(f"{agent}.md: tools must be exactly {{Read, Grep, Glob}} "
+                     f"(got {actual_tools!r})")
 
 
 # ------------------------------------------------- forbidden schema fields --
