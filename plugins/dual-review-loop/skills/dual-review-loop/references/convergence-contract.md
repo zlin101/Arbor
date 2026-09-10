@@ -169,9 +169,10 @@ NEVER appeared in this session — a re-surfacing root cause is always persisten
 (reopened), never new churn (see finding-schema.md §2 for identity rules):
 
 ```text
-persistent = previous ∩ current    # same root cause still open (or reopened)
-resolved   = previous − current    # fixed and confirmed by fresh review
-new        = current − previous    # root cause NEVER seen before in this session (churn)
+seen_before = union of all root causes that appeared in ANY previous round
+persistent  = current ∩ seen_before   # still open or reopened after absence
+new         = current − seen_before   # first appearance in this session (churn)
+resolved    = previous − current      # fixed and confirmed by fresh review
 ```
 
 - **Stagnation** (the ONLY thing the no-progress guard measures): every persistent

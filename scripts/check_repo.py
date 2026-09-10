@@ -1,16 +1,12 @@
 #!/usr/bin/env python3
-"""Arbor repo consistency checker (deterministic, stdlib only).
+"""Arbor repo consistency checker (deterministic).
 
 Validates packaging parity, protocol-file integrity, reviewer boundary
 projections, and forbidden schema fields. Exits non-zero on the first
 category with failures; prints every failure it finds.
 
-This checker understands structured facts only (paths, JSON/YAML keys, presence
-of required clauses). It does not parse policy semantics and never edits files.
-
-NOTE: PyYAML is REQUIRED for reliable frontmatter/YAML validation. Without it,
-checks degrade to string-pattern matching, which may produce false passes.
-Install with: pip install pyyaml
+Requires PyYAML (pip install pyyaml). No degraded mode: missing PyYAML
+is a hard failure.
 """
 from __future__ import annotations
 
@@ -22,8 +18,9 @@ import sys
 try:
     import yaml
 except ImportError:
-    print("WARNING: PyYAML not installed; YAML checks degrade to pattern matching", file=sys.stderr)
-    yaml = None
+    print("FATAL: PyYAML is required. Install with: pip install pyyaml",
+          file=sys.stderr)
+    sys.exit(1)
 
 REPO = pathlib.Path(__file__).resolve().parent.parent
 
@@ -44,14 +41,11 @@ def load_json(path: pathlib.Path):
 
 
 def load_yaml(path: pathlib.Path):
-    text = path.read_text(encoding="utf-8")
-    if yaml is not None:
-        try:
-            return yaml.safe_load(text)
-        except Exception as exc:  # noqa: BLE001
-            fail(f"{path}: unparseable YAML: {exc}")
-            return None
-    return text  # degraded mode: raw text, pattern checks still apply
+    try:
+        return yaml.safe_load(path.read_text(encoding="utf-8"))
+    except Exception as exc:  # noqa: BLE001
+        fail(f"{path}: unparseable YAML: {exc}")
+        return None
 
 
 # ---------------------------------------------------------------- packaging --
@@ -101,6 +95,30 @@ def read(path: pathlib.Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
+def parse_frontmatter(path: pathlib.Path) -> dict | None:
+    """Parse YAML frontmatter between --- delimiters. Returns None on failure."""
+    text = read(path)
+    lines = text.splitlines()
+    if not lines or lines[0].strip() != "---":
+        fail(f"{path.name}: frontmatter does not start with ---")
+        return None
+    try:
+        end = lines.index("---", 1)
+    except ValueError:
+        fail(f"{path.name}: frontmatter has no closing ---")
+        return None
+    raw = "\n".join(lines[1:end])
+    try:
+        data = yaml.safe_load(raw)
+    except Exception as exc:  # noqa: BLE001
+        fail(f"{path.name}: frontmatter is not valid YAML: {exc}")
+        return None
+    if not isinstance(data, dict):
+        fail(f"{path.name}: frontmatter is not a YAML mapping")
+        return None
+    return data
+
+
 def check_protocol_files() -> None:
     loop_refs = PLUGIN / "skills" / "dual-review-loop" / "references"
     required = {
@@ -113,7 +131,7 @@ def check_protocol_files() -> None:
                               "causal_link", "no `discipline: taste`"],
         "convergence-contract.md": ["structural_class: regression | improvement",
                                     "persistent", "churn", "no repository write",
-                                    "Guard precedence"],
+                                    "Guard precedence", "seen_before"],
         "output-format.md": ["exactly one canonical PASS or STOPPED outcome block"],
     }
     for name, clauses in required.items():
@@ -138,25 +156,34 @@ def check_frontmatter_and_names() -> None:
         if not path.is_file():
             fail(f"missing SKILL.md for {skill}")
             continue
-        head = "\n".join(read(path).splitlines()[:4])
-        for key in ("name:", "description:"):
-            if not re.search(rf"^{key}", head, re.M):
-                fail(f"{skill}/SKILL.md: frontmatter missing {key}")
+        fm = parse_frontmatter(path)
+        if fm is None:
+            continue
+        if not fm.get("name"):
+            fail(f"{skill}/SKILL.md: frontmatter 'name' missing or empty")
+        elif fm["name"] != skill:
+            fail(f"{skill}/SKILL.md: frontmatter name {fm['name']!r} "
+                 f"!= directory name {skill!r}")
+        if not fm.get("description"):
+            fail(f"{skill}/SKILL.md: frontmatter 'description' missing or empty")
+
         yaml_path = PLUGIN / "skills" / skill / "agents" / "openai.yaml"
         if not yaml_path.is_file():
             fail(f"missing agents/openai.yaml for {skill}")
         else:
-            ytext = read(yaml_path)
-            if yaml is not None:
-                data = load_yaml(yaml_path) or {}
-                iface = data.get("interface") or {}
-                for key in ("display_name", "short_description"):
-                    if not iface.get(key):
-                        fail(f"{skill}/agents/openai.yaml: interface.{key} empty")
-            else:
-                for key in ("interface:", "display_name"):
-                    if key not in ytext:
-                        fail(f"{skill}/agents/openai.yaml: missing {key}")
+            data = load_yaml(yaml_path)
+            if data is None:
+                continue
+            iface = data.get("interface") or {}
+            for key in ("display_name", "short_description"):
+                if not iface.get(key):
+                    fail(f"{skill}/agents/openai.yaml: interface.{key} empty")
+            # Check skill preload references the correct skill
+            preloads = data.get("preload") or {}
+            skill_ref = preloads.get("skill") or data.get("skill")
+            if skill_ref and skill_ref != skill:
+                fail(f"{skill}/agents/openai.yaml: preload skill {skill_ref!r} "
+                     f"!= {skill!r}")
     for agent in ("dual-review-correctness-reviewer", "dual-review-structure-reviewer"):
         path = PLUGIN / "agents" / f"{agent}.md"
         if not path.is_file():

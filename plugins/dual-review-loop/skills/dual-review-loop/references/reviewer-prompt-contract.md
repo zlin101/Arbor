@@ -106,7 +106,7 @@ All integrity violations (F1/F2/F3) follow a single bounded retry rule:
 
 - **First violation in a round**: discard the round, re-spawn both reviewers fresh.
   A discarded round does NOT count against `max_rounds`, and any F-ids assigned in
-  it are reclaimed.
+  it are abandoned (never reused, even if the same root cause re-surfaces later).
 - **Second violation in the same round**: STOPPED: blocked (integrity failure). The
   loop cannot converge if reviewers cannot produce valid output within the retry
   budget.
