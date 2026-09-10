@@ -100,7 +100,7 @@ def check_protocol_files() -> None:
     loop_refs = PLUGIN / "skills" / "dual-review-loop" / "references"
     required = {
         "review-scope.md": ["causally attributable to the target change",
-                            "causal_link", "frozen baseline"],
+                            "causal_link", "frozen anchor"],
         "reviewer-prompt-contract.md": ["review_materialization",
                                         "Stay read-only", "Fresh-review rule",
                                         "## 5. Runtime adaptation"],
