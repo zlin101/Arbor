@@ -5,6 +5,13 @@ outputs with verbatim reviewer verdict envelopes + per-round spawn dispatch evid
 extracted from session JSONL). Summary below; waiver for the plugin-eval budget
 finding: `plugin-eval-budget-waiver.md`.
 
+**Fixture reproduction**: the /tmp fixtures are ephemeral; `fixtures/plant.py`
+rebuilds any scenario's exact at-plant-time starting state (content-verified against
+the 2026-09-09/10 session records: `python3 docs/acceptance/fixtures/plant.py
+/tmp/repro A B C D E J` — each scenario builds a fresh git repo, applies the planted
+working-tree change, and its `python3 test_store.py` exits 0). After a scenario's loop
+run, `git diff HEAD` shows exactly what the reviewers saw.
+
 Environment: codex-cli 0.153.4 (local), Claude Code (local), fixture repo
 `/tmp/arbor-acceptance/fixture*` (base commit 28c4eb4, `store.py` + `test_store.py`
 + `AGENTS.md` declaring `python3 test_store.py` as required validation).
