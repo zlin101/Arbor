@@ -5,8 +5,8 @@ Validates packaging parity, protocol-file integrity, reviewer boundary
 projections, and forbidden schema fields. Exits non-zero on the first
 category with failures; prints every failure it finds.
 
-Requires PyYAML (pip install pyyaml). No degraded mode: missing PyYAML
-is a hard failure.
+Requires PyYAML (pip install pyyaml==6.0.2). No degraded mode: missing
+PyYAML is a hard failure.
 """
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ import sys
 try:
     import yaml
 except ImportError:
-    print("FATAL: PyYAML is required. Install with: pip install pyyaml",
+    print("FATAL: PyYAML is required. Install with: pip install pyyaml==6.0.2",
           file=sys.stderr)
     sys.exit(1)
 
@@ -32,20 +32,28 @@ def fail(msg: str) -> None:
     failures.append(msg)
 
 
-def load_json(path: pathlib.Path):
+def load_json(path: pathlib.Path) -> dict | None:
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        data = json.loads(path.read_text(encoding="utf-8"))
     except Exception as exc:  # noqa: BLE001
         fail(f"{path}: unparseable JSON: {exc}")
         return None
+    if not isinstance(data, dict):
+        fail(f"{path}: JSON root is not a mapping (got {type(data).__name__})")
+        return None
+    return data
 
 
-def load_yaml(path: pathlib.Path):
+def load_yaml(path: pathlib.Path) -> dict | None:
     try:
-        return yaml.safe_load(path.read_text(encoding="utf-8"))
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
     except Exception as exc:  # noqa: BLE001
         fail(f"{path}: unparseable YAML: {exc}")
         return None
+    if not isinstance(data, dict):
+        fail(f"{path}: YAML root is not a mapping (got {type(data).__name__})")
+        return None
+    return data
 
 
 # ---------------------------------------------------------------- packaging --
@@ -175,23 +183,42 @@ def check_frontmatter_and_names() -> None:
             if data is None:
                 continue
             iface = data.get("interface") or {}
-            for key in ("display_name", "short_description"):
-                if not iface.get(key):
-                    fail(f"{skill}/agents/openai.yaml: interface.{key} empty")
-            # Check skill preload references the correct skill
-            preloads = data.get("preload") or {}
-            skill_ref = preloads.get("skill") or data.get("skill")
-            if skill_ref and skill_ref != skill:
-                fail(f"{skill}/agents/openai.yaml: preload skill {skill_ref!r} "
-                     f"!= {skill!r}")
-    for agent in ("dual-review-correctness-reviewer", "dual-review-structure-reviewer"):
+            if not isinstance(iface, dict):
+                fail(f"{skill}/agents/openai.yaml: interface is not a mapping")
+            else:
+                for key in ("display_name", "short_description"):
+                    if not iface.get(key):
+                        fail(f"{skill}/agents/openai.yaml: interface.{key} empty")
+
+
+def check_claude_agents() -> None:
+    """Validate Claude agent definitions: frontmatter name, skills, tools."""
+    agent_skill_map = {
+        "dual-review-correctness-reviewer": "dual-review-correctness",
+        "dual-review-structure-reviewer": "dual-review-structure",
+    }
+    for agent, expected_skill in agent_skill_map.items():
         path = PLUGIN / "agents" / f"{agent}.md"
         if not path.is_file():
             fail(f"missing Claude agent definition: {agent}.md")
             continue
-        text = read(path)
-        if "tools: Read, Grep, Glob" not in text:
-            fail(f"{agent}.md: read-only tool allowlist absent")
+        fm = parse_frontmatter(path)
+        if fm is None:
+            continue
+        if not fm.get("name"):
+            fail(f"{agent}.md: frontmatter 'name' missing or empty")
+        elif fm["name"] != agent:
+            fail(f"{agent}.md: frontmatter name {fm['name']!r} != {agent!r}")
+        actual_skill = fm.get("skills")
+        if not actual_skill:
+            fail(f"{agent}.md: frontmatter 'skills' missing")
+        elif actual_skill != expected_skill:
+            fail(f"{agent}.md: skills {actual_skill!r} != {expected_skill!r}")
+        tools = fm.get("tools", "")
+        if "Read" not in tools or "Grep" not in tools or "Glob" not in tools:
+            fail(f"{agent}.md: tools missing Read/Grep/Glob (got {tools!r})")
+        if "Write" in tools or "Bash" in tools or "Edit" in tools:
+            fail(f"{agent}.md: tools includes write-capable tool (got {tools!r})")
 
 
 # ------------------------------------------------- forbidden schema fields --
@@ -227,6 +254,7 @@ def main() -> int:
     check_packaging()
     check_protocol_files()
     check_frontmatter_and_names()
+    check_claude_agents()
     check_forbidden_reviewer_fields()
     if failures:
         print(f"FAIL: {len(failures)} problem(s)")

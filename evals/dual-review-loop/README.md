@@ -80,10 +80,19 @@ RESOLVED, new independent blockers {F-c, F-d}; validation green each round.
 - v0.1 contract: cardinality 2 → 2, "set REPLACED by new independent blockers counts
   as NOT shrinking" → **stagnation on a history where every blocker was resolved.
   Wrong label; conflates churn with stagnation.**
-- v0.2 required outcome: persistent = previous ∩ current = ∅ → resolved > 0 → this
-  is progress; {F-c, F-d} recorded as churn. Stagnation requires PERSISTENT blockers
-  with no semantic improvement AND no validation improvement. max_rounds still bounds
-  endless churn.
+- v0.2 required outcome: persistent = current ∩ seen_before; new = current − seen_before;
+  resolved = previous − current. Re-opened findings are persistent, not new churn.
+  Stagnation requires PERSISTENT blockers with no semantic improvement AND no validation
+  improvement. max_rounds still bounds endless churn.
+
+### R4b — Reopened finding remains persistent (E07 extended, DECISION-PROCEDURE)
+
+Input history (max_rounds ≥ 4): r1 blockers {F-a, F-b}; r2: F-a, F-b RESOLVED, new
+{F-c}; r3: F-c RESOLVED, F-a RE-SURFACES (same root cause, original F-id reused).
+
+- v0.2 required outcome: F-a in r3 is `persistent` (seen in r1), not `new` churn.
+  seen_before = {F-a, F-b, F-c}; current = {F-a}; persistent = {F-a}.
+  If F-a also showed no improvement from its r1 form, stagnation counter increments.
 
 ## Release runbook (per release, both runtimes)
 
