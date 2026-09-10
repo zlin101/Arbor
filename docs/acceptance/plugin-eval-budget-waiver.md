@@ -3,10 +3,12 @@
 Status: **WAIVED (formal, narrowed)** · Date: 2026-09-10 · Waiver owner: zlin101
 Re-evaluate: v0.2, with observed-usage data attached (`plugin-eval benchmark`).
 
-**Measurement date: 2026-09-10 at HEAD (16 commits).** The analyzer's token estimates
-drift as contract text evolves; numbers below are point-in-time for this commit, and
-the commands shown reproduce them. Do not cite these numbers without re-running the
-commands.
+**Measurement date: 2026-09-10, tree `f33ab2ff00c806bdbae006ca4dda8ca62545d983`.**
+Plugin content is identical from the measurement commit through current HEAD
+(verified: `git diff --stat 09a8a21..HEAD -- plugins/` is empty; re-measured
+13,150 at current HEAD). The analyzer's token estimates drift as contract text
+evolves; numbers below are point-in-time for that tree, and the commands shown
+reproduce them. Do not cite these numbers without re-running the commands.
 
 ## Scope of this waiver
 
