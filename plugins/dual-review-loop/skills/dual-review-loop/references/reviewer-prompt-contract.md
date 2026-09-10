@@ -45,10 +45,36 @@ A new reviewer receives only: the current full change scope, current project rul
 relevant code, and its rubric. It never receives a narrative of what previous reviewers
 said. Mapping findings across rounds is the main agent's job (see `finding-schema.md`).
 
-## 3. Spawn checklist (main agent, before each round)
+## 3. Review materialization (the reviewers' shared input protocol)
 
-- [ ] Scope materialization attached: frozen baseline identity + current full diff /
-      changed-file contents + applicable project instructions.
+Both reviewers in the same round MUST receive the same public material. It is a
+protocol-level definition, not a runtime object or file:
+
+```yaml
+review_materialization:
+  scope:
+    type: working-tree | branch | commit-range | files
+    baseline: <commit-or-null>       # the frozen baseline identity
+    paths: [<path>]
+  project_instructions:
+    sources: [AGENTS.md, <other applicable project docs>]
+  validation_commands:               # what the project declares; NOT results
+    - <exact project-declared command>
+  target_change:
+    full_current_materialization: <diff baseline→current + changed-file contents>
+```
+
+Rules:
+
+- Same round → same materialization for both reviewers. Lens rubric and output schema
+  are NOT part of it (they differ by lens).
+- Next round → re-materialize the CURRENT state against the SAME frozen baseline.
+- NEVER included: prior-round findings, global F-ids, fix narratives, validation
+  results or history, policy profiles.
+
+## 4. Spawn checklist (main agent, before each round)
+
+- [ ] Review materialization (§3) attached, identical for both reviewers.
 - [ ] Correctness reviewer told to follow the `dual-review-correctness` skill.
 - [ ] Structure reviewer told to follow the `dual-review-structure` skill.
 - [ ] Isolation template included verbatim.
@@ -56,7 +82,7 @@ said. Mapping findings across rounds is the main agent's job (see `finding-schem
 - [ ] Output contract stated: the unified YAML verdict envelope (see
       `finding-schema.md`), findings to the parent only.
 
-## 4. Runtime adaptation
+## 5. Runtime adaptation
 
 | Runtime | Parallel spawn | Read-only enforcement | Reviewer identity |
 |---|---|---|---|
@@ -73,7 +99,7 @@ Codex per-agent `sandbox_mode = "read-only"` is configured in user/project
 can install. The loop works from the prompt contract alone; if the target project
 already defines read-only reviewer agents, prefer spawning those.
 
-## 5. Integrity defenses
+## 6. Integrity defenses
 
 - **Reviewer wrote something** (F1): if any write operation is observed from a reviewer,
   that round's result is untrusted — discard both results and re-spawn two fresh

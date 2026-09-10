@@ -77,23 +77,17 @@ Full gate definitions and fix policy: `references/convergence-contract.md`.
 
 ## Runtime adaptation (spawning reviewers)
 
-- **Claude Code**: in ONE message, dispatch both plugin agents —
-  `dual-review-correctness-reviewer` and `dual-review-structure-reviewer` — passing each
-  the same scope materialization (baseline identity, diff / changed-file contents,
-  project instructions) in labeled sections. Their read-only toolsets are enforced by
-  the runtime.
-- **Codex**: in one turn, spawn two subagents, telling each to follow its reviewer
-  skill; include the isolation template verbatim from
-  `references/reviewer-prompt-contract.md` and the same scope materialization. Optionally
-  point the user at read-only sandbox agent TOMLs — never required.
-- Both runtimes: reviewers never write, never spawn subagents, never see earlier
-  rounds' findings.
+Dispatch mechanics, read-only enforcement, and per-runtime differences live in
+`references/reviewer-prompt-contract.md` §5 — that file is the single source of truth.
+Invariants on every runtime: BOTH reviewers in one parallel turn; same review
+materialization (§3 of that file); isolation template verbatim; reviewers never write,
+never spawn subagents, never see earlier rounds' findings.
 
 ## Final report
 
-Render exactly one of the two templates in `references/output-format.md` — PASS or
-STOPPED — and nothing longer. Never commit, push, or open PRs unless the user
-explicitly asked.
+Render exactly one canonical PASS or STOPPED outcome block per
+`references/output-format.md`; extra explanation only if the user asked or a STOP
+needs it. Never commit, push, or open PRs unless the user explicitly asked.
 
 ## References
 

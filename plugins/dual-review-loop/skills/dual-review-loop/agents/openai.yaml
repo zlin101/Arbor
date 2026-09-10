@@ -1,4 +1,4 @@
 interface:
   display_name: "Dual Review Loop"
   short_description: "Two fresh read-only reviewers, single-writer fixes, validation, full-scope re-review until convergence or bounded stop"
-  default_prompt: "Run the dual review loop on the current change: freeze the scope, review with two fresh read-only reviewers, fix actionable blockers, validate, and re-review until PASS or a bounded stop."
+  default_prompt: "Run the dual review loop on the current change: freeze the scope, review with two fresh read-only reviewers, fix actionable findings, validate, and re-review until PASS or a bounded stop."

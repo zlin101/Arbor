@@ -1,6 +1,14 @@
 # Final Output Format
 
-The user gets the final state, not the process log. Two templates, nothing else.
+The final response MUST contain exactly one canonical PASS or STOPPED outcome block,
+rendered from the templates below. Additional explanation may be included around the
+block ONLY when:
+
+1. the user explicitly asked for it (e.g. "tell me in detail what you changed"); or
+2. it is necessary to explain a STOP decision.
+
+Never render a second outcome block, and never let extra prose contradict the block.
+The user always gets the final state, not the process log.
 
 ## PASS
 
