@@ -43,4 +43,6 @@ Evidence class definitions unchanged (see header above). v0.2 evidence lives in
 | `v0.2/live-run-prep.md` | prep material | fixtures verified, driver prompts, evidence checklist |
 | `v0.2/e06-cross-boundary-live-rerun.md` | LIVE-LOOP (pi orchestrator + read-only pi reviewer agents) | **PASS** on re-freeze 2 — inventory rule worked; report.py found with causal_link, fixed, verified; envelope-retry rule exercised |
 | `v0.2/e06r2-artifacts/` | raw evidence | 6 spawn inputs/outputs, driver session (lossless) |
+| `v0.2/e10-validation-failure-live.md` | LIVE-LOOP ×2 (pi runtime) | v1 change-caused: repaired in-round → PASS; v2 pre-existing: disclosed in canonical block → PASS. Deviations A/B on v1 retry path documented |
+| `v0.2/e10v1-artifacts/`, `e10v2-artifacts/` | raw evidence | spawn inputs/outputs, driver sessions (lossless) |
 | `v0.2/e06-…` / `e10-…` / `e01-…`–`e04-…` | LIVE-LOOP | **pending** — requires live driver runs (Codex + Claude) |
