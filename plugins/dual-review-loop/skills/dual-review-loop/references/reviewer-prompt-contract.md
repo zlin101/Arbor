@@ -60,7 +60,8 @@ review_materialization:
   project_instructions:
     sources: [AGENTS.md, <other applicable project docs>]
   target_change:
-    full_current_materialization: <diff baseline→current + changed-file contents>
+    full_current_materialization: <diff baseline→current + changed-file contents
+      + one-hop interaction inventory (see rules)>
 ```
 
 Rules:
@@ -68,12 +69,23 @@ Rules:
 - Same round → same materialization for both reviewers. Lens rubric and output schema
   are NOT part of it (they differ by lens).
 - Next round → re-materialize the CURRENT state against the SAME frozen baseline.
+- **One-hop interaction inventory**: before spawning, the main agent searches the
+  in-repo direct callers/callees/consumers of every interface, behavior, configuration
+  or schema the change touches (per review-scope.md §4, one hop is in scope), and
+  records the resulting path/symbol inventory. BOTH reviewers in the round receive
+  the SAME inventory. Reviewers with read tools read those locations themselves;
+  a no-tools reviewer spawn must INLINE the current contents of inventory locations
+  instead.
+- If sufficient one-hop context cannot be located or supplied, and correctness of the
+  change therefore cannot be judged, STOP `blocked (incomplete materialization)`.
+  Never shrink the scope into a PASS.
 - NEVER included: prior-round findings, global F-ids, fix narratives, validation
   commands or results (validation is orchestrator-owned — reviewers judge from
   reading code), policy profiles, or any project-required review ledger file.
 
 ## 4. Spawn checklist (main agent, before each round)
 
+- [ ] One-hop interaction inventory derived (§3 rules) and identical for both reviewers.
 - [ ] Review materialization (§3) attached, identical for both reviewers.
 - [ ] Correctness reviewer told to follow the `dual-review-correctness` skill.
 - [ ] Structure reviewer told to follow the `dual-review-structure` skill.

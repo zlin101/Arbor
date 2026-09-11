@@ -393,7 +393,9 @@ class ProtocolRequiredClauses(unittest.TestCase):
         (self.refs / "review-scope.md").write_text(
             "causally attributable to the target change\ncausal_link\nfrozen anchor\n")
         (self.refs / "reviewer-prompt-contract.md").write_text(
-            "review_materialization\nStay read-only\nFresh-review rule\n## 5. Runtime adaptation\n")
+            "review_materialization\nStay read-only\nFresh-review rule\n"
+            "## 5. Runtime adaptation\nOne-hop interaction inventory\n"
+            "incomplete materialization\n")
         (self.refs / "finding-schema.md").write_text(
             "structural_class: regression | improvement\ncausal_link\nno `discipline: taste`\n")
         (self.refs / "convergence-contract.md").write_text(
@@ -406,6 +408,16 @@ class ProtocolRequiredClauses(unittest.TestCase):
         (self.refs / "review-scope.md").write_text("# Scope\nsome content but no causal_link\n")
         check_repo.check_protocol_files()
         self.assertTrue(any("required clause absent" in f for f in check_repo.failures))
+
+    def test_missing_inventory_clause_fails(self):
+        """The one-hop inventory rule captured a real drift (E06 live run) and must
+        have a demonstrated fail branch."""
+        (self.refs / "reviewer-prompt-contract.md").write_text(
+            "review_materialization\nStay read-only\nFresh-review rule\n"
+            "## 5. Runtime adaptation\n")
+        check_repo.check_protocol_files()
+        self.assertTrue(any("One-hop interaction inventory" in f
+                            for f in check_repo.failures))
 
     def test_extra_file_fails(self):
         self._write_all_required()
