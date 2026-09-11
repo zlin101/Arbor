@@ -69,3 +69,5 @@ not depth.
 - `spawn-{r1,r2}-{correctness,structure}-verdict.md` — the 4 verdict envelopes
 - `fixture-initial.diff` — planted change snapshot (loop writes reproducible)
 - `driver-final-output.md` — canonical PASS block, verbatim
+- `observed-usage.jsonl` — 10 de-duplicated assistant-message usage samples derived
+  from the canonical session for the final plugin-eval analysis

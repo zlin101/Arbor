@@ -1,0 +1,10 @@
+{"id":"msg_202609110938524148880a7c454b8b","usage":{"input_tokens":20406,"output_tokens":147,"total_tokens":20553,"cached_tokens":0},"metadata":{"scenario":"E06 Claude release"}}
+{"id":"msg_2026091109385873fedcf172524820","usage":{"input_tokens":8271,"output_tokens":340,"total_tokens":8611,"cached_tokens":13504},"metadata":{"scenario":"E06 Claude release"}}
+{"id":"msg_202609110939204ba51264850d4a04","usage":{"input_tokens":8744,"output_tokens":130,"total_tokens":8874,"cached_tokens":21760},"metadata":{"scenario":"E06 Claude release"}}
+{"id":"msg_2026091109394182b512e9f46b46ff","usage":{"input_tokens":1168,"output_tokens":1622,"total_tokens":2790,"cached_tokens":30464},"metadata":{"scenario":"E06 Claude release"}}
+{"id":"msg_2026091109402492d271ebc09b4189","usage":{"input_tokens":1927,"output_tokens":1566,"total_tokens":3493,"cached_tokens":31616},"metadata":{"scenario":"E06 Claude release"}}
+{"id":"msg_20260911094246caa2043a2f114d2b","usage":{"input_tokens":4051,"output_tokens":3839,"total_tokens":7890,"cached_tokens":33536},"metadata":{"scenario":"E06 Claude release"}}
+{"id":"msg_202609110944302b45f7f5e1a04498","usage":{"input_tokens":3975,"output_tokens":44,"total_tokens":4019,"cached_tokens":37568},"metadata":{"scenario":"E06 Claude release"}}
+{"id":"msg_2026091109444498af58b0f4da4de9","usage":{"input_tokens":242,"output_tokens":157,"total_tokens":399,"cached_tokens":41536},"metadata":{"scenario":"E06 Claude release"}}
+{"id":"msg_20260911094453123ddfff20614af1","usage":{"input_tokens":798,"output_tokens":1823,"total_tokens":2621,"cached_tokens":41728},"metadata":{"scenario":"E06 Claude release"}}
+{"id":"msg_20260911094737650b0d0052074769","usage":{"input_tokens":3682,"output_tokens":3029,"total_tokens":6711,"cached_tokens":42496},"metadata":{"scenario":"E06 Claude release"}}

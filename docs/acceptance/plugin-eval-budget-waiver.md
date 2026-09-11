@@ -1,12 +1,67 @@
-# Waiver — plugin-eval `deferred_cost_tokens` (dual-review-loop v0.1)
+# Waiver — plugin-eval `deferred_cost_tokens` (dual-review-loop)
+
+## v0.2 re-evaluation and disposition
+
+Status: **WAIVED (formal, narrowed)** · Date: 2026-09-11 · Waiver owner: zlin101
+
+Candidate: re-freeze 2, commit `bffa075`, plugin subtree
+`8655c6a2afc43e88489d80aaf487ca95a7680625`. Acceptance-only commits after
+`bffa075` do not change that subtree.
+
+Final local analysis on this exact plugin subtree:
+
+```text
+plugin                       score 86/B   fail 1   deferred 16,963 excessive
+dual-review-loop             score 100/A  fail 0   trigger 63 moderate   invoke 1,364 good   deferred 7,884 moderate
+dual-review-correctness      score 100/A  fail 0   trigger 64 moderate   invoke 1,311 good   deferred 1,594 good
+dual-review-structure        score 100/A  fail 0   trigger 54 moderate   invoke 1,484 good   deferred 1,002 good
+```
+
+The only failing/error check remains the generic plugin-level
+`deferred_cost_tokens-budget-high`. This v0.2 waiver covers that check and no
+other check. The increase from the v0.1 point measurement (13,150 → 16,963) is
+accepted because v0.2's protocol corrections and the E06-proven one-hop
+materialization rule are the product behavior being shipped; deleting enough
+contract text to meet the generic 1,600-token band would remove reviewed safety
+and convergence semantics rather than eliminate speculative machinery.
+
+### Observed usage
+
+No additional benchmark session was launched during closeout. The analyzer ingested
+10 de-duplicated assistant-message usage samples extracted from the already archived
+E06 Claude release session. The analyzer-ready projection is
+`transcripts/v0.2/e06-claude-release-artifacts/observed-usage.jsonl`; its source is
+the adjacent `claude-session-8493e95a.jsonl`:
+
+```text
+input tokens:   total 53,264   average 5,326.4   min 242   max 20,406
+output tokens:  total 12,697   average 1,269.7   min 44    max 3,839
+total tokens:   total 65,961   average 6,596.1   min 399   max 20,553
+cached tokens:  total 294,208  average 29,420.8
+```
+
+These are real Claude Code session measurements, not per-reference attribution and
+not a Codex benchmark. Consequently they demonstrate that a two-round E06 workflow
+completed with observable usage, but they do not prove that every deferred file was
+loaded or permit a direct static-estimate/observed-cost comparison (`estimateComparison`
+was null for the generic plugin target). The owner explicitly stopped further paid
+runtime expansion; this limitation is recorded instead of manufacturing precision.
+
+Reproduction uses plugin-eval 0.1.0 `analyze` on the plugin and each skill, with
+`observed-usage.jsonl` passed through `--observed-usage`. Re-run before citing the
+figures against a different plugin subtree.
+
+---
+
+## v0.1 historical waiver
 
 Status: **WAIVED (formal, narrowed)** · Date: 2026-09-10 · Waiver owner: zlin101
-Re-evaluate: v0.2, with observed-usage data attached (`plugin-eval benchmark`).
+Re-evaluated for v0.2: see the current section above.
 
 **Measurement date: 2026-09-10, tree `f33ab2ff00c806bdbae006ca4dda8ca62545d983`.**
-Plugin content is identical from the measurement commit through current HEAD
-(verified: `git diff --stat 09a8a21..HEAD -- plugins/` is empty; re-measured
-13,150 at current HEAD). The analyzer's token estimates drift as contract text
+Plugin content was identical from the measurement commit through the then-current
+HEAD (verified at the time with `git diff --stat 09a8a21..HEAD -- plugins/`; re-measured
+13,150). The analyzer's token estimates drift as contract text
 evolves; numbers below are point-in-time for that tree, and the commands shown
 reproduce them. Do not cite these numbers without re-running the commands.
 
