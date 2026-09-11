@@ -70,3 +70,20 @@
 **E05 decision-procedure: PASS on v0.2 text.** The v0.1 failure (STOP although
 convergent) is not expressible in the frozen algorithm: with zero gate blockers the
 only exits are the validation branches.
+
+---
+
+## Re-run against re-freeze 2 (commit `bffa075`, subtree `8655c6a2…`)
+
+Amendment under test: §3 one-hop interaction inventory + incomplete-materialization
+stop. Walk delta:
+
+- Round-1 history unchanged (correctness PASS; structure one `improvement` residual).
+- Inventory rule: the orchestrator must derive the one-hop inventory before spawn. In
+  this history the changed code has no callers beyond the co-updated tests (the
+  synthetic tree's consumers are the tests themselves) — inventory is derivable and
+  supplied. No incomplete-materialization stop.
+- Gate derivation, validation-completes-convergence, PASS branches: identical to the
+  walk above. The new stop cannot fire: inventory was locatable.
+
+**E05 re-run: PASS on re-freeze 2 text. Outcome unchanged.**

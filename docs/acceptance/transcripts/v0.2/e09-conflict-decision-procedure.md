@@ -58,3 +58,16 @@ oscillation, before no progress).
 | Single pass budget | ONE evidence-resolution pass per finding | enforced in §1/§5 text | ✅ |
 
 **E09 decision-procedure: PASS on v0.2 text.**
+
+---
+
+## Re-run against re-freeze 2 (commit `bffa075`, subtree `8655c6a2…`)
+
+Amendment under test: §3 inventory + incomplete-materialization stop. The conflict
+walk (one evidence pass; settle → continue with downgrade-only; unsettle → STOPPED
+`unresolved conflict`) is a resolution-budget rule, independent of materialization
+supply. The synthetic history supplies complete reviewer verdicts over a derivable
+inventory (the queue's in-repo callers are the two call sites the evidence pass
+reads), so the new stop cannot fire and the evidence pass proceeds as walked.
+
+**E09 re-run: PASS on re-freeze 2 text. Outcome unchanged.**

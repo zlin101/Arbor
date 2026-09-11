@@ -53,3 +53,15 @@ shared `_validate_header` helper?
 **E08 decision-procedure: PASS on v0.2 text.** (v0.1 behavior preserved — this is a
 regression check; the v0.2 edit tightened attribution to the main agent's OWN fix
 directions, which this history satisfies.)
+
+---
+
+## Re-run against re-freeze 2 (commit `bffa075`, subtree `8655c6a2…`)
+
+Amendment under test: §3 inventory + incomplete-materialization stop. The oscillation
+walk is a guard-precedence decision over three completed rounds with valid verdicts;
+materialization supply is not a branch condition anywhere in it, and the history's
+changed code has derivable one-hop consumers (the co-updated tests), so the new stop
+cannot fire. Precedence order untouched by the amendment.
+
+**E08 re-run: PASS on re-freeze 2 text. Outcome unchanged.**

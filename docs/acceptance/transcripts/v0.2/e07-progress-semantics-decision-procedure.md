@@ -98,3 +98,18 @@ identified in review is closed at the text level).
 | R4b reopened finding | persistent, never new | persistent via seen_before ∩; original F-id reused | ✅ |
 
 **E07 decision-procedure: PASS on v0.2 text (all three sub-histories).**
+
+---
+
+## Re-run against re-freeze 2 (commit `bffa075`, subtree `8655c6a2…`)
+
+Amendment under test: §3 inventory + incomplete-materialization stop. All three
+sub-histories (R3/R4/R4b) are progress/guard walks over complete synthetic histories
+in which every round's reviewers return valid verdicts — the materialization is
+assumed supplied (the histories state what reviewers saw). The new stop is a
+materialization-supply rule, orthogonal to persistent/resolved/new classification and
+to every guard formula: no branch in any sub-history depends on materialization
+content. In each history the changed code's one-hop consumers are the co-reviewed
+tests, so the inventory is derivable and the stop cannot fire.
+
+**E07 re-run: PASS on re-freeze 2 text. All three outcomes unchanged.**
