@@ -1,4 +1,4 @@
-# Arbor · 信息gap
+# Arbor
 
 个人 Agent Plugin Marketplace — 一个仓库，同时发布到 OpenAI Codex 与 Claude Code。
 

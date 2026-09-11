@@ -5,7 +5,7 @@
     "name": "zlin101",
     "url": "https://github.com/zlin101"
   },
-  "description": "信息gap (Arbor) — personal agent plugin kit. First plugin: dual-review-loop, a bounded dual-review convergence loop for code changes.",
+  "description": "Arbor — personal agent plugin kit. First plugin: dual-review-loop, a bounded dual-review convergence loop for code changes.",
   "plugins": [
     {
       "name": "dual-review-loop",

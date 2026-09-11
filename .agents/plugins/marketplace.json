@@ -1,7 +1,7 @@
 {
   "name": "arbor",
   "interface": {
-    "displayName": "信息gap"
+    "displayName": "Arbor"
   },
   "plugins": [
     {
