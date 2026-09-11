@@ -41,4 +41,6 @@ Evidence class definitions unchanged (see header above). v0.2 evidence lives in
 | `v0.2/e09-conflict-decision-procedure.md` | DECISION-PROCEDURE | PASS on frozen text (both branches) |
 | `v0.2/e06-cross-boundary-live.md` | LIVE-LOOP (pi orchestrator + Claude Code reviewers) | **FAIL — contract gap**: materialization lacks one-hop callers; untouched `report.py` regression unreported, still broken in PASSed tree. Stage-1 STOP; §3 amendment proposed |
 | `v0.2/live-run-prep.md` | prep material | fixtures verified, driver prompts, evidence checklist |
+| `v0.2/e06-cross-boundary-live-rerun.md` | LIVE-LOOP (pi orchestrator + read-only pi reviewer agents) | **PASS** on re-freeze 2 — inventory rule worked; report.py found with causal_link, fixed, verified; envelope-retry rule exercised |
+| `v0.2/e06r2-artifacts/` | raw evidence | 6 spawn inputs/outputs, driver session (lossless) |
 | `v0.2/e06-…` / `e10-…` / `e01-…`–`e04-…` | LIVE-LOOP | **pending** — requires live driver runs (Codex + Claude) |

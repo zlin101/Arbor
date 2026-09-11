@@ -3,8 +3,10 @@
 - **Candidate (frozen)**: commit `943a02c67c082dfa7bc876585bb7dc406ee070c1`,
   plugin subtree `b2af293a0179426c9d425befbb4ec0d8b213fbe2`.
   If the plugin subtree changes, ALL behavioral verification re-executes.
-- Decision-procedure cases E05/E07/E08/E09: already executed, see sibling files.
-  The live runs below are the remaining stage-1 units.
+- Decision-procedure cases E05/E07/E08/E09: executed + re-executed on re-freeze 2.
+  E06: diagnostic run FAILED (materialization gap) -> amendment bffa075 -> live
+  re-run PASS (see e06-cross-boundary-live-rerun.md). Remaining: E10 + the Claude
+  release unit for E06 (plugin agents under a Claude Code driver).
 
 ## Fixtures (reproducible construction)
 
