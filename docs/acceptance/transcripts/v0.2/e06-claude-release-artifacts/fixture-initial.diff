@@ -1,0 +1,42 @@
+diff --git a/store.py b/store.py
+index c87bfe3..464a3cd 100644
+--- a/store.py
++++ b/store.py
+@@ -11,7 +11,9 @@ class Store:
+         self.audit.append(("set", key))
+ 
+     def get(self, key, default=None):
+-        return self._data.get(key, default)
++        # v2 contract: returns a (value, found) tuple so callers can tell
++        # "stored None" from "absent".
++        return (self._data.get(key, default), True)
+ 
+     def delete(self, key):
+         if key in self._data:
+diff --git a/test_store.py b/test_store.py
+index 33a2c46..e87042d 100644
+--- a/test_store.py
++++ b/test_store.py
+@@ -7,18 +7,18 @@ class TestStore(unittest.TestCase):
+     def test_set_get_roundtrip(self):
+         s = Store()
+         s.set("a", 1)
+-        self.assertEqual(s.get("a"), 1)
++        self.assertEqual(s.get("a"), (1, True))
+ 
+     def test_get_default(self):
+         s = Store()
+-        self.assertIsNone(s.get("missing"))
+-        self.assertEqual(s.get("missing", 0), 0)
++        self.assertEqual(s.get("missing"), (None, True))
++        self.assertEqual(s.get("missing", 0), (0, True))
+ 
+     def test_delete(self):
+         s = Store()
+         s.set("a", 1)
+         self.assertTrue(s.delete("a"))
+-        self.assertIsNone(s.get("a"))
++        self.assertEqual(s.get("a"), (None, True))
+         self.assertFalse(s.delete("a"))
+ 
+ 

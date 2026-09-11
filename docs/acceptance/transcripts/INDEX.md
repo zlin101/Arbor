@@ -45,4 +45,6 @@ Evidence class definitions unchanged (see header above). v0.2 evidence lives in
 | `v0.2/e06r2-artifacts/` | raw evidence | 6 spawn inputs/outputs, driver session (lossless) |
 | `v0.2/e10-validation-failure-live.md` | LIVE-LOOP ×2 (pi runtime) | v1 change-caused: repaired in-round → PASS; v2 pre-existing: disclosed in canonical block → PASS. Deviations A/B on v1 retry path documented |
 | `v0.2/e10v1-artifacts/`, `e10v2-artifacts/` | raw evidence | spawn inputs/outputs, driver sessions (lossless) |
+| `v0.2/e06-claude-release.md` | LIVE-LOOP **Claude release runtime** | **PASS** — real plugin agents (Read/Grep/Glob), literal same-turn parallel (same message.id ×2 rounds), untouched-caller finding with causal_link by BOTH lenses, audit downgrade exercised, independent re-verification of all 12 claims |
+| `v0.2/e06-claude-release-artifacts/` | raw evidence | canonical session JSONL + stream-json.gz + 4 spawn prompts + 4 verdicts + fixture diff (lossless) |
 | `v0.2/e06-…` / `e10-…` / `e01-…`–`e04-…` | LIVE-LOOP | **pending** — requires live driver runs (Codex + Claude) |
